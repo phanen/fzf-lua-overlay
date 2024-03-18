@@ -1,4 +1,5 @@
 # fzf-lua-overlay
+[![CI](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml/badge.svg)](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml)
 
 An overlay on fzf-lua to provide powerful default.
 
