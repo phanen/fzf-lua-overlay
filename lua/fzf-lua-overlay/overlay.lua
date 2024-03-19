@@ -1,9 +1,10 @@
 local notes_actions = require 'fzf-lua-overlay.actions'
+local cfg = require 'fzf-lua-overlay.config'
 
 local overlay = setmetatable({
   find_dots = { 'files', { cwd = '~' } },
   grep_dots = { 'live_grep_native', { cwd = '~' } },
-  grep_notes = { 'live_grep_native', { cwd = '~/notes' } },
+  grep_notes = { 'live_grep_native', { cwd = cfg.notes_dir } },
   todo_comment = { 'grep', { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
   lsp_references = {
     'lsp_references',
@@ -12,10 +13,10 @@ local overlay = setmetatable({
   find_notes = {
     'files',
     {
-      cwd = '~/notes',
+      cwd = cfg.notes_dir,
       actions = notes_actions,
       fzf_opts = {
-        ['--history'] = vim.fn.stdpath 'state' .. '/fzf_notes_history',
+        ['--history'] = cfg.notes_history,
       },
       file_icons = false,
       git_icons = false,
@@ -24,9 +25,13 @@ local overlay = setmetatable({
   zoxide = {
     'fzf_exec',
     {
-      prompt = 'zoxide>',
+      prompt = 'zoxide> ',
+      preview = 'ls --color {2}',
       actions = {
         ['default'] = function(selected)
+          if not selected or not selected[1] then
+            return
+          end
           local path = selected[1]:match '/.+'
           vim.system { 'zoxide', 'add', path }
           vim.api.nvim_set_current_dir(path)
@@ -38,16 +43,20 @@ local overlay = setmetatable({
   plugins = {
     'fzf_exec',
     {
-      prompt = 'zoxide>',
+      prompt = 'plugins> ',
+      preview = ('ls --color %s/{1}'):format(cfg.plugins_dir),
       actions = {
         ['default'] = function(selected)
-          local path = selected[1]:match '/.+'
+          if not selected or not selected[1] then
+            return
+          end
+          local path = ('%s/%s'):format(cfg.plugins_dir, selected[1])
           vim.system { 'zoxide', 'add', path }
           vim.api.nvim_set_current_dir(path)
         end,
       },
     },
-    ('ls %s'):format(vim.fn.stdpath 'data' .. '/lazy'),
+    ('ls %s'):format(cfg.plugins_dir, cfg.plugins_dir),
   },
 }, { -- other static opts lazy to write
   __index = function(t, k)
