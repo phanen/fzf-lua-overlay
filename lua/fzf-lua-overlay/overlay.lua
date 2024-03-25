@@ -63,6 +63,20 @@ local overlay = setmetatable({
     {
       prompt = 'scriptnames> ',
       previewer = 'builtin',
+      actions = {
+        ['default'] = function(...)
+          require('fzf-lua').actions.file_edit(...)
+        end,
+        ['ctrl-s'] = function(...)
+          require('fzf-lua').actions.file_edit_or_qf(...)
+        end,
+        ['ctrl-y'] = {
+          fn = function(selected)
+            vim.fn.setreg('+', selected[1]:sub(7))
+          end,
+          reload = true,
+        },
+      },
     },
     function(fzf_cb)
       coroutine.wrap(function()
