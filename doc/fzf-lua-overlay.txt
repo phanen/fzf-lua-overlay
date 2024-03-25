@@ -1,9 +1,10 @@
-*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 March 21
+*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 March 25
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
 
 1. fzf-lua-overlay                           |fzf-lua-overlay-fzf-lua-overlay|
+  - features                        |fzf-lua-overlay-fzf-lua-overlay-features|
   - usage                              |fzf-lua-overlay-fzf-lua-overlay-usage|
 
 ==============================================================================
@@ -11,7 +12,12 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 
 <https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml>
 
-An overlay on fzf-lua to provide powerful default.
+Strong defaults and new pickers for fzf-lua.
+
+
+FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
+
+new pickers zoxide plugins notes/journals scriptnames …
 
 
 USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
