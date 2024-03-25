@@ -1,7 +1,15 @@
 # fzf-lua-overlay
 [![CI](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml)
 
-An overlay on fzf-lua to provide powerful default.
+Strong defaults and new pickers for fzf-lua.
+
+## features
+new pickers
+* zoxide
+* plugins
+* notes/journals
+* scriptnames
+* ...
 
 ## usage
 Feel free to copy to dotfiles, refer to:

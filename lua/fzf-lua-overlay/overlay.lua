@@ -58,15 +58,35 @@ local overlay = setmetatable({
     },
     ('ls %s'):format(cfg.plugins_dir, cfg.plugins_dir),
   },
+  scriptnames = {
+    'fzf_exec',
+    {
+      prompt = 'scriptnames> ',
+      previewer = 'builtin',
+    },
+    function(fzf_cb)
+      coroutine.wrap(function()
+        local co = coroutine.running()
+        local scripts = vim.fn.getscriptinfo()
+        for _, script in ipairs(scripts) do
+          vim.print(script)
+          fzf_cb(script.name, function()
+            coroutine.resume(co)
+          end)
+          coroutine.yield()
+        end
+        fzf_cb()
+      end)()
+    end,
+  },
 }, { -- other static opts lazy to write
   __index = function(t, k)
     local opts = {}
     if k:match 'lsp' then
       opts.jump_to_single_result = true
     end
-    local v = { k, opts }
-    t[k] = v
-    return v
+    t[k] = { k, opts }
+    return t[k]
   end,
 })
 
