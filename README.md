@@ -9,6 +9,7 @@ new pickers
 * plugins
 * notes/journals
 * scriptnames
+* runtimepath
 * ...
 
 ## usage

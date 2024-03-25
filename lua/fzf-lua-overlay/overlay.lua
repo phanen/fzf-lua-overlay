@@ -1,4 +1,5 @@
-local notes_actions = require 'fzf-lua-overlay.actions'
+local notes_actions = require 'fzf-lua-overlay.actions'.notes
+local files_actions = require 'fzf-lua-overlay.actions'.files
 local cfg = require 'fzf-lua-overlay.config'
 
 local overlay = setmetatable({
@@ -63,20 +64,7 @@ local overlay = setmetatable({
     {
       prompt = 'scriptnames> ',
       previewer = 'builtin',
-      actions = {
-        ['default'] = function(...)
-          require('fzf-lua').actions.file_edit(...)
-        end,
-        ['ctrl-s'] = function(...)
-          require('fzf-lua').actions.file_edit_or_qf(...)
-        end,
-        ['ctrl-y'] = {
-          fn = function(selected)
-            vim.fn.setreg('+', selected[1]:sub(7))
-          end,
-          reload = true,
-        },
-      },
+      actions = files_actions,
     },
     function(fzf_cb)
       coroutine.wrap(function()
@@ -85,6 +73,36 @@ local overlay = setmetatable({
         for _, script in ipairs(scripts) do
           vim.print(script)
           fzf_cb(script.name, function()
+            coroutine.resume(co)
+          end)
+          coroutine.yield()
+        end
+        fzf_cb()
+      end)()
+    end,
+  },
+  rtp = {
+    'fzf_exec',
+    {
+      prompt = 'rtp> ',
+      preview = 'ls --color {1}',
+      actions = {
+        ['default'] = function(selected)
+          if not selected or not selected[1] then
+            return
+          end
+          local path = selected[1]
+          vim.system { 'zoxide', 'add', path }
+          vim.api.nvim_set_current_dir(path)
+        end,
+      },
+    },
+    function(fzf_cb)
+      coroutine.wrap(function()
+        local co = coroutine.running()
+        local rtps = vim.api.nvim_list_runtime_paths()
+        for _, rtp in ipairs(rtps) do
+          fzf_cb(rtp, function()
             coroutine.resume(co)
           end)
           coroutine.yield()

@@ -52,4 +52,22 @@ local notes_actions = {
   ['ctrl-x'] = delete_files,
 }
 
-return notes_actions
+local files_actions = {
+  ['default'] = function(...)
+    require('fzf-lua').actions.file_edit(...)
+  end,
+  ['ctrl-s'] = function(...)
+    require('fzf-lua').actions.file_edit_or_qf(...)
+  end,
+  ['ctrl-y'] = {
+    fn = function(selected)
+      vim.fn.setreg('+', selected[1]:sub(7))
+    end,
+    reload = true,
+  },
+}
+
+return {
+  notes = notes_actions,
+  files = files_actions,
+}
