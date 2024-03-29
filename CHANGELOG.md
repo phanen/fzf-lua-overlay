@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.3.0...v1.4.0) (2024-03-29)
+
+
+### Features
+
+* add actions ([5a4872c](https://github.com/phanen/fzf-lua-overlay/commit/5a4872c02c613bf0daef9acc656bb332593204ba))
+
+
+### Bug Fixes
+
+* open in browser ([14c545c](https://github.com/phanen/fzf-lua-overlay/commit/14c545c565b71fb78982dff36146b7adba789c84))
+
 ## [1.3.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.2.0...v1.3.0) (2024-03-29)
 
 
