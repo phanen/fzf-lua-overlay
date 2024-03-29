@@ -1,4 +1,6 @@
-local toggle_daily = function(_, opts)
+local M = {}
+
+M.toggle_daily = function(_, opts)
   local o = opts.__call_opts
   if opts.show_daily_only then
     o.cmd = 'fd --color=never --type f --hidden --follow --exclude .git'
@@ -9,7 +11,7 @@ local toggle_daily = function(_, opts)
   opts.__call_fn(o)
 end
 
-local create_notes = function(_, opts)
+M.create_notes = function(_, opts)
   local query = require('fzf-lua').get_last_query()
   if not query or query == '' then
     query = os.date '%m-%d'
@@ -27,7 +29,7 @@ local create_notes = function(_, opts)
   vim.cmd.e(path)
 end
 
-local delete_files = function(selected, opts)
+M.delete_files = function(selected, opts)
   -- TODO: multi?
   local cwd = opts.cwd or vim.fn.getcwd()
   local path = vim.fn.expand(('%s/%s'):format(cwd, selected[1]))
@@ -46,12 +48,4 @@ local delete_files = function(selected, opts)
   })
 end
 
-local notes_actions = {
-  ['ctrl-g'] = toggle_daily,
-  ['ctrl-n'] = create_notes,
-  ['ctrl-x'] = delete_files,
-}
-
-return {
-  notes = notes_actions,
-}
+return M

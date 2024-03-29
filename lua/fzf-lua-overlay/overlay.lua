@@ -1,4 +1,3 @@
-local act = require 'fzf-lua-overlay.actions'
 local cfg = require 'fzf-lua-overlay.config'
 
 local lsp_opt_fn = function(k)
@@ -17,7 +16,7 @@ local overlay = setmetatable({
     'files',
     {
       cwd = cfg.notes_dir,
-      actions = act.notes,
+      actions = cfg.notes_actions,
       fzf_opts = {
         ['--history'] = cfg.notes_history,
       },
