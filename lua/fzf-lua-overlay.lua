@@ -19,15 +19,10 @@ end
 return setmetatable(M, {
   __index = function(_, k)
     return function()
-      local opts, ropts, key, fzf_exec_arg
-      key, opts, fzf_exec_arg = unpack(require('fzf-lua-overlay.overlay')[k])
-      ropts = opts_fn(k)
-      opts = vim.tbl_deep_extend('force', opts, ropts or {})
-      if fzf_exec_arg then
-        require('fzf-lua').fzf_exec(fzf_exec_arg, opts)
-      else
-        require('fzf-lua')[key](opts)
-      end
+      local key, opts, fzf_exec_arg = unpack(require('fzf-lua-overlay.overlay')[k])
+      opts = vim.tbl_deep_extend('force', opts, opts_fn(k) or {})
+      local args = key == 'fzf_exec' and vim.F.pack_len(fzf_exec_arg, opts) or vim.F.pack_len(opts)
+      require('fzf-lua')[key](vim.F.unpack_len(args))
     end
   end,
 })
