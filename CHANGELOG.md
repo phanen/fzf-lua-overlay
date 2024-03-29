@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.2.0...v1.3.0) (2024-03-29)
+
+
+### Features
+
+* custom dot_dir ([2a80a11](https://github.com/phanen/fzf-lua-overlay/commit/2a80a11e5570f30678b3c80434fc6046cfc0b7b3))
+* use setup opts in fzf_exec ([d8f2d0a](https://github.com/phanen/fzf-lua-overlay/commit/d8f2d0a6ed0ff113b8d5170f4e6113c7266e7854))
+
+
+### Bug Fixes
+
+* path ([6e287fe](https://github.com/phanen/fzf-lua-overlay/commit/6e287fe310685ba2de64a83d10b978e678e0f9c5))
+* previewer for plugins ([624eb7d](https://github.com/phanen/fzf-lua-overlay/commit/624eb7ddd2184686edc6e3a38e634d55ae57fda4))
+
 ## [1.2.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.1.0...v1.2.0) (2024-03-25)
 
 
