@@ -40,6 +40,20 @@ return {
         local name = selected[1]
         vim.ui.open(lazy_cfg.plugins[name].url)
       end,
+      ['ctrl-l'] = function(selected)
+        if not selected or not selected[1] then
+          return
+        end
+        local name = selected[1]
+        require('fzf-lua').files { cwd = lazy_cfg.plugins[name].dir }
+      end,
+      ['ctrl-n'] = function(selected)
+        if not selected or not selected[1] then
+          return
+        end
+        local name = selected[1]
+        require('fzf-lua').live_grep_native { cwd = lazy_cfg.plugins[name].dir }
+      end,
     },
   },
   function(fzf_cb)
