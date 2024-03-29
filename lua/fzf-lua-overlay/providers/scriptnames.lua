@@ -1,11 +1,14 @@
-local act = require 'fzf-lua-overlay.actions'
+local fl_opts = require('fzf-lua.config').setup_opts
+
+local file_actions =
+  vim.tbl_deep_extend('force', fl_opts.actions.files or {}, fl_opts.actions.files or {})
 
 return {
   'fzf_exec',
   {
     prompt = 'scriptnames> ',
     previewer = 'builtin',
-    actions = act.files,
+    actions = file_actions,
   },
   function(fzf_cb)
     coroutine.wrap(function()
