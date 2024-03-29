@@ -45,4 +45,11 @@ util.getregion = function(mode)
   return getregion(mode)
 end
 
+util.chdir = function(path)
+  if vim.fn.executable('zoxide') then
+    vim.system { 'zoxide', 'add', path }
+  end
+  vim.api.nvim_set_current_dir(path)
+end
+
 return util
