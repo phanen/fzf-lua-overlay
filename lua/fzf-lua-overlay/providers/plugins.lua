@@ -31,7 +31,14 @@ return {
           return
         end
         local name = selected[1]
-        require('util').chdir(lazy_cfg.plugins[name].dir)
+        require('fzf-lua-overlay.util').chdir(lazy_cfg.plugins[name].dir)
+      end,
+      ['ctrl-o'] = function(selected)
+        if not selected or not selected[1] then
+          return
+        end
+        local name = selected[1]
+        vim.ui.open(lazy_cfg.plugins[name].dir)
       end,
     },
   },

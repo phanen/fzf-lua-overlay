@@ -9,8 +9,7 @@ return {
           return
         end
         local path = selected[1]
-        vim.system { 'zoxide', 'add', path }
-        vim.api.nvim_set_current_dir(path)
+        require('fzf-lua-overlay.util').chdir(path)
       end,
     },
   },

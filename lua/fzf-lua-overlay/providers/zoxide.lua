@@ -9,7 +9,7 @@ return {
           return
         end
         local path = selected[1]:match '/.+'
-        require('util').chdir(path)
+        require('fzf-lua-overlay.util').chdir(path)
       end,
     },
   },
