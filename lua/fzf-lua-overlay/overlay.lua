@@ -9,8 +9,8 @@ local lsp_opt_fn = function(k)
 end
 
 local overlay = setmetatable({
-  find_dots = { 'files', { cwd = '~' } },
-  grep_dots = { 'live_grep_native', { cwd = '~' } },
+  find_dots = { 'files', { cwd = cfg.dot_dir } },
+  grep_dots = { 'live_grep_native', { cwd = cfg.dot_dir } },
   grep_notes = { 'live_grep_native', { cwd = cfg.notes_dir } },
   todo_comment = { 'grep', { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
   find_notes = {
