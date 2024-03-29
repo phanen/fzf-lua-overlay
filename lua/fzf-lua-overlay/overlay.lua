@@ -1,5 +1,4 @@
-local notes_actions = require 'fzf-lua-overlay.actions'.notes
-local files_actions = require 'fzf-lua-overlay.actions'.files
+local act = require 'fzf-lua-overlay.actions'
 local cfg = require 'fzf-lua-overlay.config'
 
 local overlay = setmetatable({
@@ -15,7 +14,7 @@ local overlay = setmetatable({
     'files',
     {
       cwd = cfg.notes_dir,
-      actions = notes_actions,
+      actions = act.notes,
       fzf_opts = {
         ['--history'] = cfg.notes_history,
       },
@@ -51,27 +50,40 @@ local overlay = setmetatable({
           if not selected or not selected[1] then
             return
           end
-          local path = ('%s/%s'):format(cfg.plugins_dir, selected[1])
+          local name = selected[1]
+          local plugin = package.loaded['lazy.core.config'].plugins[name]
+          local path = plugin.dir
           vim.system { 'zoxide', 'add', path }
           vim.api.nvim_set_current_dir(path)
         end,
       },
     },
-    ('ls %s'):format(cfg.plugins_dir, cfg.plugins_dir),
+    function(fzf_cb)
+      coroutine.wrap(function()
+        local co = coroutine.running()
+        local plugins = package.loaded['lazy.core.config'].plugins
+        for plugin in pairs(plugins) do
+          fzf_cb(plugin, function()
+            coroutine.resume(co)
+          end)
+          coroutine.yield()
+        end
+        fzf_cb()
+      end)()
+    end,
   },
   scriptnames = {
     'fzf_exec',
     {
       prompt = 'scriptnames> ',
       previewer = 'builtin',
-      actions = files_actions,
+      actions = act.files,
     },
     function(fzf_cb)
       coroutine.wrap(function()
         local co = coroutine.running()
         local scripts = vim.fn.getscriptinfo()
         for _, script in ipairs(scripts) do
-          vim.print(script)
           fzf_cb(script.name, function()
             coroutine.resume(co)
           end)

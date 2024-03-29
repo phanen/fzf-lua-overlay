@@ -1,3 +1,5 @@
+local M = {}
+
 ---@diagnostic disable-next-line: undefined-global
 local util = util or require 'fzf-lua-overlay.utils'
 
@@ -10,7 +12,11 @@ local opts_fn = function(k)
   end
 end
 
-return setmetatable({}, {
+M.setup = function(opts)
+  require('fzf-lua-overlay.config').setup(opts)
+end
+
+return setmetatable(M, {
   __index = function(_, k)
     return function()
       local opts, ropts, key, fzf_exec_arg
