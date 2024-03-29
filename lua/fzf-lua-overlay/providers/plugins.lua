@@ -38,7 +38,7 @@ return {
           return
         end
         local name = selected[1]
-        vim.ui.open(lazy_cfg.plugins[name].dir)
+        vim.ui.open(lazy_cfg.plugins[name].url)
       end,
     },
   },
