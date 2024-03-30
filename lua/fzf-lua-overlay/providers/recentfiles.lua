@@ -1,3 +1,8 @@
+local fl_opts = require('fzf-lua.config').setup_opts
+
+local file_actions =
+  vim.tbl_deep_extend('force', fl_opts.actions.files or {}, fl_opts.actions.files or {})
+
 local session_files = {}
 
 return {
@@ -5,6 +10,7 @@ return {
   opts = {
     prompt = 'recent> ',
     previewer = 'builtin',
+    actions = file_actions,
   },
   fzf_exec_arg = function(fzf_cb)
     local opts = { file_icons = true, color_icons = true }
