@@ -2,19 +2,19 @@ local cfg = require 'fzf-lua-overlay.config'
 
 local lsp_opt_fn = function(k)
   return {
-    k,
-    { ignore_current_line = true, includeDeclaration = false, jump_to_single_result = true },
+    name = k,
+    opts = { ignore_current_line = true, includeDeclaration = false, jump_to_single_result = true },
   }
 end
 
 local overlay = setmetatable({
-  find_dots = { 'files', { cwd = cfg.dot_dir } },
-  grep_dots = { 'live_grep_native', { cwd = cfg.dot_dir } },
-  grep_notes = { 'live_grep_native', { cwd = cfg.notes_dir } },
-  todo_comment = { 'grep', { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
+  find_dots = { name = 'files', opts = { cwd = cfg.dot_dir } },
+  grep_dots = { name = 'live_grep_native', opts = { cwd = cfg.dot_dir } },
+  grep_notes = { name = 'live_grep_native', opts = { cwd = cfg.notes_dir } },
+  todo_comment = { name = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
   find_notes = {
-    'files',
-    {
+    name = 'files',
+    opts = {
       cwd = cfg.notes_dir,
       actions = cfg.notes_actions,
       fzf_opts = {
@@ -28,7 +28,7 @@ local overlay = setmetatable({
   __index = function(t, k)
     local ok, ret = pcall(require, ('fzf-lua-overlay.providers.%s'):format(k))
     if not ok then -- evaluate static opts
-      ret = k:match 'lsp' and lsp_opt_fn(k) or { k, {} }
+      ret = k:match 'lsp' and lsp_opt_fn(k) or { name = k, opts = {} }
     end
     t[k] = ret
     return ret

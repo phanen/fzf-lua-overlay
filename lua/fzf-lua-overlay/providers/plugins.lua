@@ -21,8 +21,8 @@ function lazy_previewer:cmdline(o)
 end
 
 return {
-  'fzf_exec',
-  {
+  name = 'fzf_exec',
+  opts = {
     prompt = 'plugins> ',
     previewer = lazy_previewer,
     actions = {
@@ -52,7 +52,7 @@ return {
       end,
     },
   },
-  function(fzf_cb)
+  fzf_exec_arg = function(fzf_cb)
     coroutine.wrap(function()
       local co = coroutine.running()
       local plugins = lazy_cfg.plugins

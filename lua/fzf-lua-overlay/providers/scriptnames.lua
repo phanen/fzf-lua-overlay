@@ -4,13 +4,13 @@ local file_actions =
   vim.tbl_deep_extend('force', fl_opts.actions.files or {}, fl_opts.actions.files or {})
 
 return {
-  'fzf_exec',
-  {
+  name = 'fzf_exec',
+  opts = {
     prompt = 'scriptnames> ',
     previewer = 'builtin',
     actions = file_actions,
   },
-  function(fzf_cb)
+  fzf_exec_arg = function(fzf_cb)
     coroutine.wrap(function()
       local co = coroutine.running()
       local scripts = vim.fn.getscriptinfo()

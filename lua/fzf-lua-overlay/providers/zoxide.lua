@@ -1,6 +1,6 @@
 return {
-  'fzf_exec',
-  {
+  name = 'fzf_exec',
+  opts = {
     prompt = 'zoxide> ',
     preview = 'ls --color {2}',
     actions = {
@@ -18,5 +18,5 @@ return {
       end,
     },
   },
-  'zoxide query -ls',
+  fzf_exec_arg = 'zoxide query -ls',
 }

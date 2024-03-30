@@ -1,6 +1,6 @@
 return {
-  'fzf_exec',
-  {
+  name = 'fzf_exec',
+  opts = {
     prompt = 'rtp> ',
     preview = 'ls --color {1}',
     actions = {
@@ -18,7 +18,7 @@ return {
       end,
     },
   },
-  function(fzf_cb)
+  fzf_exec_arg = function(fzf_cb)
     coroutine.wrap(function()
       local co = coroutine.running()
       local rtps = vim.api.nvim_list_runtime_paths()
