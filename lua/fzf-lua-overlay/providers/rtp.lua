@@ -5,23 +5,14 @@ return {
     preview = 'ls --color {1}',
     actions = {
       ['default'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local path = selected[1]
         require('fzf-lua-overlay.util').chdir(path)
       end,
       ['ctrl-l'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local path = selected[1]
         require('fzf-lua').files { cwd = path }
       end,
       ['ctrl-n'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local path = selected[1]
         require('fzf-lua').live_grep_native { cwd = path }
       end,

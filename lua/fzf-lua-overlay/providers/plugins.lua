@@ -27,30 +27,18 @@ return {
     previewer = lazy_previewer,
     actions = {
       ['default'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local name = selected[1]
         require('fzf-lua-overlay.util').chdir(lazy_cfg.plugins[name].dir)
       end,
       ['ctrl-o'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local name = selected[1]
         vim.ui.open(lazy_cfg.plugins[name].url)
       end,
       ['ctrl-l'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local name = selected[1]
         require('fzf-lua').files { cwd = lazy_cfg.plugins[name].dir }
       end,
       ['ctrl-n'] = function(selected)
-        if not selected or not selected[1] then
-          return
-        end
         local name = selected[1]
         require('fzf-lua').live_grep_native { cwd = lazy_cfg.plugins[name].dir }
       end,
