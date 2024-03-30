@@ -1,7 +1,7 @@
 local M = {}
 
 ---@diagnostic disable-next-line: undefined-global
-local util = util or require 'fzf-lua-overlay.utils'
+local util = require 'fzf-lua-overlay.util'
 
 local opts_fn = function(k)
   local text = table.concat(util.getregion())
