@@ -42,6 +42,14 @@ return {
         local name = selected[1]
         require('fzf-lua').live_grep_native { cwd = lazy_cfg.plugins[name].dir }
       end,
+      ['ctrl-r'] = function(selected)
+        local name = selected[1]
+        if lazy_cfg.plugins[name]._.loaded then
+          vim.cmd.Lazy('reload ' .. name)
+        else
+          vim.cmd.Lazy('load ' .. name)
+        end
+      end,
     },
   },
   function(fzf_cb)
