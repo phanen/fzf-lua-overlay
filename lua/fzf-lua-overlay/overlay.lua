@@ -1,4 +1,4 @@
-local cfg = require 'fzf-lua-overlay.config'
+local cfg = require 'fzf-lua-overlay.config'.opts
 
 local lsp_opt_fn = function(k)
   return {

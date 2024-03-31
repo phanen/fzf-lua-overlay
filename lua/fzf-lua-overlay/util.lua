@@ -52,4 +52,45 @@ util.chdir = function(path)
   vim.api.nvim_set_current_dir(path)
 end
 
+util.read_file = function(path)
+  local fd = io.open(path, 'r')
+  if not fd then
+    return nil
+  end
+  local content = fd:read('*a')
+  fd:close()
+  return content or ''
+end
+
+util.write_file = function(path, str)
+  local fd = io.open(path, 'w')
+  if not fd then
+    return false
+  end
+  fd:write(str)
+  fd:close()
+  return true
+end
+
+util.read_json = function(path, opts)
+  opts = opts or {}
+  local str = util.read_file(path)
+  local ok, tbl = pcall(vim.json.decode, str, opts)
+  return ok and tbl or {}
+end
+
+util.write_json = function(path, tbl)
+  local ok, str = pcall(vim.json.encode, tbl)
+  if not ok then
+    return false
+  end
+  return util.write_file(path, str)
+end
+
+util.find_gitroot = function()
+  local path = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+  local root = vim.system({ 'git', '-C', path, 'rev-parse', '--show-toplevel' }):wait().stdout
+  return vim.trim(root)
+end
+
 return util
