@@ -59,7 +59,7 @@ return {
         if vim.api.nvim_buf_get_name(ev.buf) == '' then
           return
         end
-        session_files[ev.file] = true
+        session_files[ev.match] = true
       end,
     })
   end,
