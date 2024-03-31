@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.5.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.4.0...v1.5.0) (2024-03-31)
+
+
+### Features
+
+* add recentfiles picker ([0bf7165](https://github.com/phanen/fzf-lua-overlay/commit/0bf7165601575c780c77c7c97101df4d92855930))
+* don't show opened buffers as entry ([270c558](https://github.com/phanen/fzf-lua-overlay/commit/270c558a0d1e74f60771fa8f5f90bba92622b9be))
+* gitignore picker ([a21a9e7](https://github.com/phanen/fzf-lua-overlay/commit/a21a9e7165b2df1213c6c6779dedfea506df2ad5))
+* license picker ([edf4c10](https://github.com/phanen/fzf-lua-overlay/commit/edf4c10ac84093f0689ffeab93a3ef39cbce5fd8))
+* optional commands ([f76b6f5](https://github.com/phanen/fzf-lua-overlay/commit/f76b6f583133876a7bb13f88eba4596f79f4206c))
+* reload plugins ([764eb7d](https://github.com/phanen/fzf-lua-overlay/commit/764eb7d6ddb119ae1413f78e4765c6241a76fc24))
+
+
+### Bug Fixes
+
+* disable custom global ([b1b3d39](https://github.com/phanen/fzf-lua-overlay/commit/b1b3d39a4663b6edc270012bb1d928155ed0ef02))
+* error path ([cde0f95](https://github.com/phanen/fzf-lua-overlay/commit/cde0f95b87f3516189c4485337ea2adaf4f36565))
+* missing actions again... ([106fb79](https://github.com/phanen/fzf-lua-overlay/commit/106fb799146f0073828776644d748e4ceb15bfd1))
+* store abs path ([db567dd](https://github.com/phanen/fzf-lua-overlay/commit/db567dd82cee72e541a387ae045f098464600854))
+
 ## [1.4.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.3.0...v1.4.0) (2024-03-29)
 
 
