@@ -10,6 +10,8 @@ Strong defaults and new pickers for fzf-lua.
 * zoxide
 * scriptnames
 * runtimepath
+* gitignore
+* license
 * ...
 
 ## usage
@@ -24,6 +26,7 @@ local fl = setmetatable({}, {
 
 return {
   'phanen/fzf-lua-overlay',
+  cmd = "FLO",
   init = function()
     require('fzf-lua-overlay.providers.recentfiles').init()
   end,
@@ -64,3 +67,11 @@ return {
   dependencies = { 'ibhagwan/fzf-lua' },
 }
 ```
+
+## credit
+* <https://github.com/ibhagwan/fzf-lua>
+* <https://github.com/kilavila/nvim-gitignore>
+* <https://github.com/roginfarrer/fzf-lua-lazy.nvim>
+
+## todo
+* [ ] inject new pickers into fzflua builtin

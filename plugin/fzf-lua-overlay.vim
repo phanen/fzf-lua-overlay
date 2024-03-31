@@ -12,10 +12,12 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
         \"scriptnames",
         \"zoxide",
         \"todo_comment",
+        \"gitignore",
+        \"license",
         \]
   let list = [l:builtin_list]
   return join(list[0],"\n")
 endfunction
 
-command! -nargs=1 -complete=custom,s:fzf_lua_overlay_complete FzfLuaO lua require('fzf-lua-overlay').<args>()
+command! -nargs=1 -complete=custom,s:fzf_lua_overlay_complete FL lua require('fzf-lua-overlay').<args>()
 
