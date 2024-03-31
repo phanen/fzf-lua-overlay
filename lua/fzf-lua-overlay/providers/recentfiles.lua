@@ -5,6 +5,7 @@ local file_actions =
 
 local session_files = {}
 
+-- TODO: better to use recent opened files
 return {
   name = 'fzf_exec',
   opts = {
@@ -29,13 +30,22 @@ return {
     coroutine.wrap(function()
       local utils = require 'fzf-lua.utils'
       local co = coroutine.running()
+
+      local buflist = vim.fn.getbufinfo { bufloaded = 1, buflisted = 1 }
+      local bufmap = {}
+      -- get table of values from list of tables
+      for _, buf in ipairs(buflist) do
+        bufmap[buf.name] = true
+      end
+
       for file, _ in pairs(session_files) do
-        vim.print(file)
-        add_entry(file, co)
+        if not bufmap[file] then
+          add_entry(file, co)
+        end
       end
       for _, file in ipairs(vim.v.oldfiles) do
         local fs_stat = not utils.file_is_fifo(file) and utils.file_is_readable(file)
-        if fs_stat and not session_files[file] then
+        if fs_stat and not session_files[file] and not bufmap[file] then
           add_entry(file, co)
         end
       end
