@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 March 30
+*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 March 31
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -6,6 +6,8 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 1. fzf-lua-overlay                           |fzf-lua-overlay-fzf-lua-overlay|
   - features                        |fzf-lua-overlay-fzf-lua-overlay-features|
   - usage                              |fzf-lua-overlay-fzf-lua-overlay-usage|
+  - credit                            |fzf-lua-overlay-fzf-lua-overlay-credit|
+  - todo                                |fzf-lua-overlay-fzf-lua-overlay-todo|
 2. Links                                               |fzf-lua-overlay-links|
 
 ==============================================================================
@@ -24,6 +26,8 @@ FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
 - zoxide
 - scriptnames
 - runtimepath
+- gitignore
+- license
 - …
 
 
@@ -41,6 +45,7 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
     
     return {
       'phanen/fzf-lua-overlay',
+      cmd = "FLO",
       init = function()
         require('fzf-lua-overlay.providers.recentfiles').init()
       end,
@@ -81,6 +86,18 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
       dependencies = { 'ibhagwan/fzf-lua' },
     }
 <
+
+
+CREDIT                                *fzf-lua-overlay-fzf-lua-overlay-credit*
+
+- <https://github.com/ibhagwan/fzf-lua>
+- <https://github.com/kilavila/nvim-gitignore>
+- <https://github.com/roginfarrer/fzf-lua-lazy.nvim>
+
+
+TODO                                    *fzf-lua-overlay-fzf-lua-overlay-todo*
+
+- inject new pickers into fzflua builtin
 
 ==============================================================================
 2. Links                                               *fzf-lua-overlay-links*
