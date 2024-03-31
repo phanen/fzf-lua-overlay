@@ -39,7 +39,8 @@ return {
       end
 
       for file, _ in pairs(session_files) do
-        if not bufmap[file] then
+        local fs_stat = not utils.file_is_fifo(file) and utils.file_is_readable(file)
+        if fs_stat and not bufmap[file] then
           add_entry(file, co)
         end
       end
