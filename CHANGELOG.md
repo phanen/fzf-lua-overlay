@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/phanen/fzf-lua-overlay/compare/v1.5.0...v1.5.1) (2024-03-31)
+
+
+### Bug Fixes
+
+* santinize ([94d97a4](https://github.com/phanen/fzf-lua-overlay/commit/94d97a44252a15d440bd9d1c8b323faf9065c5d7))
+
 ## [1.5.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.4.0...v1.5.0) (2024-03-31)
 
 
