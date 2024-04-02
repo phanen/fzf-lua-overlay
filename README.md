@@ -3,6 +3,11 @@
 
 Strong defaults and new pickers for fzf-lua.
 
+
+https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d
+
+
+
 ## features
 * recent files (`vim.v.oldfiles` + recent closed files)
 * `lazy.nvim` plugins (preview/chdir/browse)
