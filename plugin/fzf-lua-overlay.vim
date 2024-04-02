@@ -8,6 +8,7 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
         \"grep_dots",
         \"grep_notes",
         \"plugins",
+        \"recentfiles",
         \'rtp',
         \"scriptnames",
         \"zoxide",

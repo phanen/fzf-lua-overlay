@@ -90,6 +90,9 @@ end
 util.find_gitroot = function()
   local path = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
   local root = vim.system({ 'git', '-C', path, 'rev-parse', '--show-toplevel' }):wait().stdout
+  if not root or root == '' then
+    return
+  end
   return vim.trim(root)
 end
 
