@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 April 02
+*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 April 03
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -17,8 +17,8 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 
 Strong defaults and new pickers for fzf-lua.
 
-
-https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d
+mp4: showcase
+<https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d>
 
 
 FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
