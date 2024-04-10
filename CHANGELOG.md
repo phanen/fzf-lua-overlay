@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.5.1...v1.6.0) (2024-04-09)
+
+
+### Features
+
+* use lru for recent closed files ([772a858](https://github.com/phanen/fzf-lua-overlay/commit/772a858e364304a60ce47cff0c353e5419febd45))
+
 ## [1.5.1](https://github.com/phanen/fzf-lua-overlay/compare/v1.5.0...v1.5.1) (2024-03-31)
 
 
