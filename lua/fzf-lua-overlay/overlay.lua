@@ -19,6 +19,8 @@ local overlay = setmetatable({
       ret = k:match 'lsp' and lsp_opt_fn(k) or { name = k, opts = {} }
     end
     t[k] = ret
+    ret.opts.prompt = false
+    ret.opts.winopts = { title = ' ' .. k .. ' ', title_pos = 'center' }
     return ret
   end,
 })
