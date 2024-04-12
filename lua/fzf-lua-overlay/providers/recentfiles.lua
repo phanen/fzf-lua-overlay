@@ -56,14 +56,10 @@ M.fzf_exec_arg = function(fzf_cb)
   local opts = { file_icons = true, color_icons = true }
   local function add_entry(x, co)
     x = require('fzf-lua.make_entry').file(x, opts)
-    if not x then
-      return
-    end
+    if not x then return end
     fzf_cb(x, function(err)
       coroutine.resume(co)
-      if err then
-        fzf_cb()
-      end
+      if err then fzf_cb() end
     end)
   end
   coroutine.wrap(function()
@@ -79,15 +75,11 @@ M.fzf_exec_arg = function(fzf_cb)
 
     lru_foreach(function(file)
       local fs_stat = not utils.file_is_fifo(file) and utils.file_is_readable(file)
-      if fs_stat and not bufmap[file] then
-        add_entry(file, co)
-      end
+      if fs_stat and not bufmap[file] then add_entry(file, co) end
     end)
     for _, file in ipairs(vim.v.oldfiles) do
       local fs_stat = not utils.file_is_fifo(file) and utils.file_is_readable(file)
-      if fs_stat and not session_files[file] and not bufmap[file] then
-        add_entry(file, co)
-      end
+      if fs_stat and not session_files[file] and not bufmap[file] then add_entry(file, co) end
     end
     fzf_cb()
   end)()
@@ -98,9 +90,7 @@ M.init = function()
     group = vim.api.nvim_create_augroup('FzfLuaRecentFiles', { clear = true }),
     callback = function(ev)
       -- workaround for open no name buffer on enter...
-      if vim.api.nvim_buf_get_name(ev.buf) == '' then
-        return
-      end
+      if vim.api.nvim_buf_get_name(ev.buf) == '' then return end
       local filename = ev.match
       lru_access(filename)
       -- lru_peek()

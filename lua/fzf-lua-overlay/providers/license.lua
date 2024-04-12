@@ -13,16 +13,12 @@ M.opts = {
     ['default'] = function(selected)
       local util = require('fzf-lua-overlay.util')
       local gitroot = util.find_gitroot()
-      if not gitroot then
-        vim.notify('not in a git repository')
-      end
+      if not gitroot then vim.notify('not in a git repository') end
       local path = vim.fs.joinpath(gitroot, 'LICENSE')
       vim.print(path)
       if vim.uv.fs_stat(path) then
         local confirm = vim.fn.confirm('Override?', '&Yes\n&No')
-        if confirm ~= 1 then
-          return
-        end
+        if confirm ~= 1 then return end
       end
       local template_url = ('%s/%s'):format(url, selected[1])
       local content = vim.fn.system { 'curl', '-s', template_url }
@@ -47,9 +43,7 @@ M.fzf_exec_arg = function(fzf_cb)
   coroutine.wrap(function()
     local co = coroutine.running()
     for _, item in ipairs(json) do
-      fzf_cb(item.key, function()
-        coroutine.resume(co)
-      end)
+      fzf_cb(item.key, function() coroutine.resume(co) end)
       coroutine.yield()
     end
     fzf_cb()

@@ -23,9 +23,7 @@ return {
       local co = coroutine.running()
       local rtps = vim.api.nvim_list_runtime_paths()
       for _, rtp in ipairs(rtps) do
-        fzf_cb(rtp, function()
-          coroutine.resume(co)
-        end)
+        fzf_cb(rtp, function() coroutine.resume(co) end)
         coroutine.yield()
       end
       fzf_cb()

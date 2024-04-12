@@ -32,6 +32,7 @@ return {
   init = function()
     require('fzf-lua-overlay.providers.recentfiles').init()
   end,
+  dependencies = { 'ibhagwan/fzf-lua' },
   -- stylua: ignore
   keys = {
     { '<c-b>',         fl.buffers,               mode = { 'n', 'x' } },
@@ -66,7 +67,6 @@ return {
     { '<leader>l',     fl.find_dots,             mode = { 'n', 'x' } },
     { '+l',            fl.grep_dots,             mode = { 'n' } },
   },
-  dependencies = { 'ibhagwan/fzf-lua' },
 }
 ```
 

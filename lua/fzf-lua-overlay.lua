@@ -12,9 +12,7 @@ local opts_fn = function(k)
   end
 end
 
-M.setup = function(opts)
-  require('fzf-lua-overlay.config').setup(opts)
-end
+M.setup = function(opts) require('fzf-lua-overlay.config').setup(opts) end
 
 return setmetatable(M, {
   __index = function(_, k)

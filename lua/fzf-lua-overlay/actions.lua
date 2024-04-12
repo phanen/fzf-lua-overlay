@@ -13,9 +13,7 @@ end
 
 M.create_notes = function(_, opts)
   local query = require('fzf-lua').get_last_query()
-  if not query or query == '' then
-    query = os.date '%m-%d'
-  end
+  if not query or query == '' then query = os.date '%m-%d' end
   local path = vim.fn.expand(('%s/%s.md'):format(opts.cwd, query))
   if not vim.uv.fs_stat(path) then
     local file = io.open(path, 'a')
@@ -57,9 +55,7 @@ M.rename_files = function(selected, opts)
   local oldname = vim.fs.basename(oldpath)
   local newname = vim.fn.input('New name: ', oldname)
   newname = vim.trim(newname)
-  if newname == '' or newname == oldname then
-    return
-  end
+  if newname == '' or newname == oldname then return end
   local cwd = opts.cwd or vim.fn.getcwd()
   local newpath = ('%s/%s'):format(cwd, newname)
   vim.uv.fs_rename(oldpath, newpath)

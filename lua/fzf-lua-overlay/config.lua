@@ -8,11 +8,6 @@ local default_opts = {
 
 M.opts = default_opts
 
-M.setup = function(opts)
-  M.opts = vim.tbl_deep_extend('force', default_opts, opts or {})
-  if not vim.uv.fs_stat(M.opts.cache_dir) then
-    vim.fn.mkdir(M.opts.cache_dir)
-  end
-end
+M.setup = function(opts) M.opts = vim.tbl_deep_extend('force', default_opts, opts or {}) end
 
 return M

@@ -57,9 +57,7 @@ return {
       local co = coroutine.running()
       local plugins = lazy_cfg.plugins
       for plugin in pairs(plugins) do
-        fzf_cb(plugin, function()
-          coroutine.resume(co)
-        end)
+        fzf_cb(plugin, function() coroutine.resume(co) end)
         coroutine.yield()
       end
       fzf_cb()
