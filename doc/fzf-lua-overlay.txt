@@ -52,6 +52,7 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
       init = function()
         require('fzf-lua-overlay.providers.recentfiles').init()
       end,
+      dependencies = { 'ibhagwan/fzf-lua' },
       -- stylua: ignore
       keys = {
         { '<c-b>',         fl.buffers,               mode = { 'n', 'x' } },
@@ -86,7 +87,6 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
         { '<leader>l',     fl.find_dots,             mode = { 'n', 'x' } },
         { '+l',            fl.grep_dots,             mode = { 'n' } },
       },
-      dependencies = { 'ibhagwan/fzf-lua' },
     }
 <
 
