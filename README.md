@@ -10,7 +10,7 @@ Strong defaults and new pickers for fzf-lua.
 * `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
 * zoxide integration for `chdir` actions
 * misc: rtp, scriptnames, gitignore/license template
-* notes/dotfiles manage
+* notes/dotfiles management
 * ...
 
 ## usage
