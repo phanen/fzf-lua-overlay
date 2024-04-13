@@ -7,13 +7,10 @@ Strong defaults and new pickers for fzf-lua.
 
 ## features
 * recent files (`vim.v.oldfiles` + recent closed files)
-* `lazy.nvim` plugins (preview/chdir/browse)
-* notes/journals
-* zoxide
-* scriptnames
-* runtimepath
-* gitignore
-* license
+* `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
+* zoxide integration for `chdir` actions
+* misc: rtp, scriptnames, gitignore/license template
+* notes/dotfiles manage
 * ...
 
 ## usage
@@ -77,3 +74,5 @@ return {
 
 ## todo
 * [ ] inject new pickers into fzflua builtin
+* [ ] boardcast/pull session from other neovim instance by some what actions?
+* [ ] integration with dirstack.nvim
