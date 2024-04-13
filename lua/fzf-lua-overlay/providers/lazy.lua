@@ -59,10 +59,17 @@ M.opts = {
             local co = coroutine.running()
             local plugins = lazy_cfg.plugins
             for _, plug_spec in pairs(plugins) do
-              local name = plug_spec[1]
-              if not name then goto continue end
-              -- TODO: handle gitlab source plugins
-              fzf_cb(name, function() coroutine.resume(co) end)
+              local plug_name = plug_spec[1]
+              if not plug_name then
+                local url = plug_spec.url
+                vim.print(url)
+                if not url then goto continue end
+                local url_slice = vim.split(url, '/')
+                local author = url_slice[#url_slice - 1]
+                local repo = url_slice[#url_slice]
+                plug_name = author .. '/' .. repo
+              end
+              fzf_cb(plug_name, function() coroutine.resume(co) end)
               coroutine.yield()
               ::continue::
             end
