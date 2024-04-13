@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 April 12
+*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 April 13
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -24,13 +24,10 @@ mp4: showcase
 FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
 
 - recent files (`vim.v.oldfiles` + recent closed files)
-- `lazy.nvim` plugins (preview/chdir/browse)
-- notes/journals
-- zoxide
-- scriptnames
-- runtimepath
-- gitignore
-- license
+- `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
+- zoxide integration for `chdir` actions
+- misc: rtp, scriptnames, gitignore/license template
+- notes/dotfiles manage
 - …
 
 
@@ -101,6 +98,8 @@ CREDIT                                *fzf-lua-overlay-fzf-lua-overlay-credit*
 TODO                                    *fzf-lua-overlay-fzf-lua-overlay-todo*
 
 - inject new pickers into fzflua builtin
+- boardcast/pull session from other neovim instance by some what actions?
+- integration with dirstack.nvim
 
 ==============================================================================
 2. Links                                               *fzf-lua-overlay-links*
