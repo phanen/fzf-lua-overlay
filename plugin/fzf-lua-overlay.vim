@@ -5,16 +5,16 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
   let l:builtin_list = [
         \"find_dots",
         \"find_notes",
+        \"gitignore",
         \"grep_dots",
         \"grep_notes",
-        \"plugins",
+        \"lazy",
+        \"license",
         \"recentfiles",
         \'rtp',
         \"scriptnames",
-        \"zoxide",
         \"todo_comment",
-        \"gitignore",
-        \"license",
+        \"zoxide",
         \]
   let list = [l:builtin_list]
   return join(list[0],"\n")
