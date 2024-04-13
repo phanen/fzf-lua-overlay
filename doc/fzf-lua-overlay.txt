@@ -27,7 +27,7 @@ FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
 - `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
 - zoxide integration for `chdir` actions
 - misc: rtp, scriptnames, gitignore/license template
-- notes/dotfiles manage
+- notes/dotfiles management
 - …
 
 
