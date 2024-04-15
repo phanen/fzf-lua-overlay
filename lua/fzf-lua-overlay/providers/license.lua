@@ -6,6 +6,7 @@ local cache_path = vim.fs.joinpath(cache_dir, 'license.json')
 local M = {}
 
 M.name = 'fzf_exec'
+
 M.prompt = 'license> '
 
 M.opts = {

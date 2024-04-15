@@ -3,6 +3,8 @@ return {
   opts = {
     prompt = 'zoxide> ',
     preview = 'ls --color {2}',
+    -- preview = 'onefetch {2}',
+    -- preview = 'tokei {2}',
     actions = {
       ['default'] = function(selected)
         local path = selected[1]:match '/.+'
