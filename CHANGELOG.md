@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.7.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.6.0...v1.7.0) (2024-04-15)
+
+
+### Features
+
+* add toggle author actions for lazy.nvim ([41ba5ea](https://github.com/phanen/fzf-lua-overlay/commit/41ba5ea15424eace25e0dec9bfa8b7a819a063c2))
+* inject default-title style ([8197f62](https://github.com/phanen/fzf-lua-overlay/commit/8197f62071b8c21ada17455a751e96b7b9041075))
+* prefer buf's root for `git*` picker ([84e2260](https://github.com/phanen/fzf-lua-overlay/commit/84e226012903e154390e5adfdd0ed7c3ca0c453f))
+
+
+### Bug Fixes
+
+* parse generic url when missing plugin name ([5289af9](https://github.com/phanen/fzf-lua-overlay/commit/5289af9afee10de49b09d84b69e00b7f2fb793db))
+* shebang ([ee879a9](https://github.com/phanen/fzf-lua-overlay/commit/ee879a9a8208914b534155632f5ad2db169b59bf))
+
 ## [1.6.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.5.1...v1.6.0) (2024-04-09)
 
 
