@@ -75,11 +75,21 @@ u.write_json = function(path, tbl)
   return u.write_file(path, str)
 end
 
-u.find_gitroot = function()
-  local path = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
-  local root = vim.system({ 'git', '-C', path, 'rev-parse', '--show-toplevel' }):wait().stdout
-  if not root or root == '' then return end
-  return vim.trim(root)
+u.gitroot = function(bufname)
+  bufname = bufname and bufname or vim.api.nvim_buf_get_name(0)
+  local path = vim.fs.dirname(bufname)
+  local root = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait().stdout
+  if root then
+    root = vim.trim(root)
+  else
+    for dir in vim.fs.parents(bufname) do
+      if vim.fn.isdirectory(dir .. '/.git') == 1 then
+        root = dir
+        break
+      end
+    end
+  end
+  return root
 end
 
 return u

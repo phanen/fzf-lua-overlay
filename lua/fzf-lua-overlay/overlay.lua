@@ -16,7 +16,11 @@ local overlay = setmetatable({
   __index = function(t, k)
     local ok, ret = pcall(require, ('fzf-lua-overlay.providers.%s'):format(k))
     if not ok then -- evaluate static opts
-      ret = k:match 'lsp' and lsp_opt_fn(k) or { name = k, opts = {} }
+      if k:match 'lsp' then
+        ret = lsp_opt_fn(k)
+      else
+        ret = { name = k, opts = {} }
+      end
     end
     t[k] = ret
     ret.opts.prompt = false

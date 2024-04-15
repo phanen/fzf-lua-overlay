@@ -8,7 +8,14 @@ local opts_fn = function(k)
   if k:match 'grep' then
     return { search = text }
   else
-    return { fzf_opts = { ['--query'] = text ~= '' and text or nil } }
+    local opts = {}
+    opts.fzf_opts = { ['--query'] = text ~= '' and text or nil }
+
+    if k:match 'git' then -- prefer buf's gitroot
+      local dir = util.gitroot()
+      opts.cwd = dir and dir or vim.fn.getcwd()
+    end
+    return opts
   end
 end
 

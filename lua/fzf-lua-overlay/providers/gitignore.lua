@@ -12,7 +12,7 @@ M.opts = {
   actions = {
     ['default'] = function(selected)
       local util = require('fzf-lua-overlay.util')
-      local gitroot = util.find_gitroot()
+      local gitroot = util.gitroot()
       if not gitroot then vim.notify('not in a git repository') end
       local path = vim.fs.joinpath(gitroot, '.gitignore')
       vim.print(path)
