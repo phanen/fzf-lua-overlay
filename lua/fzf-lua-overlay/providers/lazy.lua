@@ -51,7 +51,7 @@ M.opts = {
         vim.cmd.Lazy('load ' .. name)
       end
     end,
-    -- toggle author perfix
+    -- toggle username prefix
     ['ctrl-g'] = function()
       require('fzf-lua').fzf_exec(
         function(fzf_cb)
@@ -65,9 +65,9 @@ M.opts = {
                 vim.print(url)
                 if not url then goto continue end
                 local url_slice = vim.split(url, '/')
-                local author = url_slice[#url_slice - 1]
+                local username = url_slice[#url_slice - 1]
                 local repo = url_slice[#url_slice]
-                plug_name = author .. '/' .. repo
+                plug_name = username .. '/' .. repo
               end
               fzf_cb(plug_name, function() coroutine.resume(co) end)
               coroutine.yield()

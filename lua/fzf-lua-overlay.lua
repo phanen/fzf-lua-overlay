@@ -3,21 +3,7 @@ local M = {}
 ---@diagnostic disable-next-line: undefined-global
 local util = require 'fzf-lua-overlay.util'
 
-local opts_fn = function(k)
-  local text = table.concat(util.getregion())
-  if k:match 'grep' then
-    return { search = text }
-  else
-    local opts = {}
-    opts.fzf_opts = { ['--query'] = text ~= '' and text or nil }
-
-    if k:match 'git' then -- prefer buf's gitroot
-      local dir = util.gitroot()
-      opts.cwd = dir and dir or vim.fn.getcwd()
-    end
-    return opts
-  end
-end
+local opts_fn = function(k) return { query = table.concat(util.getregion()) } end
 
 M.setup = function(opts) require('fzf-lua-overlay.config').setup(opts) end
 
