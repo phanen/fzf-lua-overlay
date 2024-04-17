@@ -1,5 +1,3 @@
-local cfg = require 'fzf-lua-overlay.config'.opts
-
 local lsp_opt_fn = function(k)
   return {
     name = k,
@@ -8,9 +6,6 @@ local lsp_opt_fn = function(k)
 end
 
 local overlay = setmetatable({
-  find_dots = { name = 'files', opts = { cwd = cfg.dot_dir } },
-  grep_dots = { name = 'live_grep_native', opts = { cwd = cfg.dot_dir } },
-  grep_notes = { name = 'live_grep_native', opts = { cwd = cfg.notes_dir } },
   todo_comment = { name = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
 }, {
   __index = function(t, k)
