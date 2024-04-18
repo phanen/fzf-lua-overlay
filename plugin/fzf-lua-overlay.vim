@@ -13,6 +13,7 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
         \"recentfiles",
         \'rtp',
         \"scriptnames",
+        \"snips",
         \"todo_comment",
         \"todos",
         \"zoxide",
