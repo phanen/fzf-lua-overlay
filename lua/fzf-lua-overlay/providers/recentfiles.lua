@@ -2,8 +2,7 @@ local M = {}
 
 local fl_opts = require('fzf-lua.config').setup_opts
 
-local file_actions =
-  vim.tbl_deep_extend('force', fl_opts.actions.files or {}, fl_opts.actions.files or {})
+local file_actions = vim.tbl_get(fl_opts, 'actions', 'files')
 
 -- simple lru (recent closed filename)
 -- recent opened?

@@ -54,8 +54,8 @@ u.read_file = function(path)
   return content or ''
 end
 
-u.write_file = function(path, str)
-  local fd = io.open(path, 'w')
+u.write_file = function(path, str, flag)
+  local fd = io.open(path, flag or 'w')
   if not fd then return false end
   fd:write(str)
   fd:close()

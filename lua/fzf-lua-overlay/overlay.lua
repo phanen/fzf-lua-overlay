@@ -18,8 +18,12 @@ local overlay = setmetatable({
       end
     end
     t[k] = ret
+    -- overide default-title profile #1
     ret.opts.prompt = false
-    ret.opts.winopts = { title = ' ' .. k .. ' ', title_pos = 'center' }
+    ret.opts.winopts = vim.tbl_deep_extend('force', ret.opts.winopts or {}, {
+      title = ' ' .. k .. ' ',
+      title_pos = 'center',
+    })
     return ret
   end,
 })

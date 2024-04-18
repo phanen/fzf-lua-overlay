@@ -14,6 +14,7 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
         \'rtp',
         \"scriptnames",
         \"todo_comment",
+        \"todos",
         \"zoxide",
         \]
   let list = [l:builtin_list]

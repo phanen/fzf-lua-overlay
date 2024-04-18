@@ -8,8 +8,7 @@ return {
     cwd = cfg.notes_dir,
     actions = {
       ['ctrl-g'] = function(...)
-        -- https://github.com/Bekaboo/nvim/blob/7ed3725c753753964eea6081bbd3cba304a3042f/lua/configs/fzf-lua.lua#L60
-        local last_query = require('fzf-lua').config.__resume_data.last_query
+        local last_query = require('fzf-lua').get_last_query()
         return require('fzf-lua-overlay').grep_notes({ query = last_query })
       end,
       ['ctrl-n'] = function(...) require('fzf-lua-overlay.actions').create_notes(...) end,
