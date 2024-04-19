@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.8.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.7.0...v1.8.0) (2024-04-19)
+
+
+### Features
+
+* allow other exts ([23319f9](https://github.com/phanen/fzf-lua-overlay/commit/23319f9abd7d95b91db8bf967800f40d56baf74c))
+* multiple dirs ([c75d1f3](https://github.com/phanen/fzf-lua-overlay/commit/c75d1f353f58ed0f23ecd68a5128e4830743773b))
+* passthrough opts ([a9e0656](https://github.com/phanen/fzf-lua-overlay/commit/a9e0656a58c23c53b21c3b735930e2d6804f5f91))
+* show README if exist for lazy plugins ([9beb358](https://github.com/phanen/fzf-lua-overlay/commit/9beb35861fcc1c566e1acd24da021dceaef0ebb8))
+* todos manager ([6c476e4](https://github.com/phanen/fzf-lua-overlay/commit/6c476e48fef78162d5ec8e9738a3d0756da88329))
+* toggle between find/grep ([c75d1f3](https://github.com/phanen/fzf-lua-overlay/commit/c75d1f353f58ed0f23ecd68a5128e4830743773b))
+
+
+### Bug Fixes
+
+* correct way to get last query ([6c476e4](https://github.com/phanen/fzf-lua-overlay/commit/6c476e48fef78162d5ec8e9738a3d0756da88329))
+* nil actions ([6c476e4](https://github.com/phanen/fzf-lua-overlay/commit/6c476e48fef78162d5ec8e9738a3d0756da88329))
+* revert git buf local opts ([c18aee1](https://github.com/phanen/fzf-lua-overlay/commit/c18aee1034ae2a35639a1f8743c017082f5f14ef))
+* typos ([c18aee1](https://github.com/phanen/fzf-lua-overlay/commit/c18aee1034ae2a35639a1f8743c017082f5f14ef))
+
 ## [1.7.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.6.0...v1.7.0) (2024-04-15)
 
 
