@@ -20,7 +20,7 @@ M.create_notes = function(_, opts)
   if #(vim.split(query, '.', { plain = true })) == 1 then path = path .. '.md' end
   if not vim.uv.fs_stat(path) then
     local u = require('fzf-lua-overlay.util')
-    local ok = u.write_file(path, 'a')
+    local ok = u.write_file(path, nil, 'w')
     if not ok then return vim.notify(('fail to create file %s'):format(path)) end
   end
   vim.cmd.e(path)

@@ -57,7 +57,7 @@ end
 u.write_file = function(path, str, flag)
   local fd = io.open(path, flag or 'w')
   if not fd then return false end
-  fd:write(str)
+  if str then fd:write(str) end
   fd:close()
   return true
 end
@@ -76,7 +76,7 @@ u.write_json = function(path, tbl)
 end
 
 u.gitroot = function(bufname)
-  bufname = bufname and bufname or vim.api.nvim_buf_get_name(0)
+  if not bufname then bufname = vim.api.nvim_buf_get_name(0) end
   local path = vim.fs.dirname(bufname)
   local root = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait().stdout
   if root then
