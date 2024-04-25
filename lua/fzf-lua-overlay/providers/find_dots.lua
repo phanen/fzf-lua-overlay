@@ -9,7 +9,7 @@ M.name = 'files'
 M.opts = {
   prompt = 'find_dots> ',
   cwd = cfg.dot_dir,
-  cmd = ([[rg --color=never --files --hidden %s --follow -g "!.git"]]):format(
+  cmd = ([[rg --color=never --files --hidden %s --follow --no-messages -g "!.git"]]):format(
     table.concat(cfg.dot_dirs, ' ')
   ),
 }

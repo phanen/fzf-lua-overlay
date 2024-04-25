@@ -20,7 +20,7 @@ function lazy_previewer:cmdline(o)
 
     -- builtin preview(e.g. `buffer_or_file:extend()`) support limit static file format
     -- use bat to show readme then fallback to `ls`
-    local bat = 'bat --color=always --style=numbers,changes {}'
+    local bat = 'bat --color=always --style=numbers,changes'
     for name, type in vim.fs.dir(dir) do
       if type == 'file' and name:lower():find('readme') then
         return ('%s %s'):format(bat, vim.fs.joinpath(dir, name))

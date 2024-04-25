@@ -3,7 +3,7 @@ local M = {}
 M.toggle_daily = function(_, opts)
   local o = opts.__call_opts
   if opts.show_daily_only then
-    o.cmd = 'fd --color=never --type f --hidden --follow --exclude .git'
+    o.cmd = 'fd --color=never --type f --hidden --follow --no-messages --exclude .git'
   else
     o.cmd = 'fd "[0-9][0-9]-[0-9][0-9]*"  --type f'
   end
