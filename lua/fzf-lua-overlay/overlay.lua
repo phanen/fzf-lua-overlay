@@ -1,9 +1,4 @@
-local lsp_opt_fn = function(k)
-  return {
-    name = k,
-    opts = { ignore_current_line = true, includeDeclaration = false, jump_to_single_result = true },
-  }
-end
+-- local lsp_opt_fn = function() end
 
 local overlay = setmetatable({
   todo_comment = { name = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
@@ -11,19 +6,16 @@ local overlay = setmetatable({
   __index = function(t, k)
     local ok, ret = pcall(require, ('fzf-lua-overlay.providers.%s'):format(k))
     if not ok then -- evaluate static opts
-      if k:match 'lsp' then
-        ret = lsp_opt_fn(k)
-      else
-        ret = { name = k, opts = {} }
-      end
+      ret = { name = k, opts = {} }
     end
-    t[k] = ret
+    assert(ret.opts)
     -- overide default-title profile #1
     ret.opts.prompt = false
     ret.opts.winopts = vim.tbl_deep_extend('force', ret.opts.winopts or {}, {
       title = ' ' .. k .. ' ',
       title_pos = 'center',
     })
+    t[k] = ret
     return ret
   end,
 })
