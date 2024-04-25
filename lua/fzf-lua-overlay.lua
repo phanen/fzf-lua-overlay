@@ -1,11 +1,12 @@
 local M = {}
 
----@diagnostic disable-next-line: undefined-global
-local util = require 'fzf-lua-overlay.util'
-
-local opts_fn = function(k) return { query = table.concat(util.getregion()) } end
+local opts_fn = function(_)
+  return { query = table.concat(require('fzf-lua-overlay.util').getregion()) }
+end
 
 M.setup = function(opts) require('fzf-lua-overlay.config').setup(opts) end
+
+M.init = function() return require('fzf-lua-overlay._init') end
 
 return setmetatable(M, {
   __index = function(_, k)
@@ -14,8 +15,7 @@ return setmetatable(M, {
       local name, opts, fzf_exec_arg = o.name, o.opts, o.fzf_exec_arg
       opts = vim.tbl_deep_extend('force', opts, opts_fn(k) or {})
 
-      -- backend of new pickers (no use as api)
-      if name == 'fzf_exec' then
+      if name == 'fzf_exec' then -- backend of new pickers (useless as api)
         require('fzf-lua').fzf_exec(fzf_exec_arg, opts)
       else
         opts = vim.tbl_deep_extend('force', opts, _opts or {})

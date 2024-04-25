@@ -1,15 +1,12 @@
 local M = {}
 
-local fl_opts = require('fzf-lua.config').setup_opts
-
-local file_actions = vim.tbl_get(fl_opts, 'actions', 'files')
-
 -- simple lru (recent closed filename)
--- recent opened?
-local session_files = {}
+local session_files = require('fzf-lua-overlay.shared').session_files
 local head = { n = nil }
 local tail = { p = head }
 head.n = tail
+
+-- used in init setup
 local lru_access = function(k)
   local ptr = session_files[k]
   if ptr then
@@ -43,12 +40,17 @@ end
 --   end)
 -- end
 
+-- export for init setup or whatever
+M._ = {}
+M._.lru_access = lru_access
+M._.lru_foreach = lru_foreach
+
 M.name = 'fzf_exec'
 
 M.opts = {
   prompt = 'recent> ',
   previewer = 'builtin',
-  actions = file_actions,
+  actions = vim.tbl_get(require('fzf-lua.config').setup_opts, 'actions', 'files'),
 }
 
 M.fzf_exec_arg = function(fzf_cb)
@@ -82,19 +84,6 @@ M.fzf_exec_arg = function(fzf_cb)
     end
     fzf_cb()
   end)()
-end
-
-M.init = function()
-  vim.api.nvim_create_autocmd('BufDelete', {
-    group = vim.api.nvim_create_augroup('FzfLuaRecentFiles', { clear = true }),
-    callback = function(ev)
-      -- workaround for open no name buffer on enter...
-      if vim.api.nvim_buf_get_name(ev.buf) == '' then return end
-      local filename = ev.match
-      lru_access(filename)
-      -- lru_peek()
-    end,
-  })
 end
 
 return M
