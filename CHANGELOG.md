@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/phanen/fzf-lua-overlay/compare/v1.8.0...v1.8.1) (2024-04-21)
+
+
+### Bug Fixes
+
+* write nil should create file ([08404cd](https://github.com/phanen/fzf-lua-overlay/commit/08404cd310d8d022cc775bfc368651a0d0e56fcd))
+
 ## [1.8.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.7.0...v1.8.0) (2024-04-19)
 
 
