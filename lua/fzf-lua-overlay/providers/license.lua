@@ -3,13 +3,13 @@ local url = 'https://api.github.com/licenses'
 local cache_dir = require('fzf-lua-overlay.config').opts.cache_dir
 local cache_path = vim.fs.joinpath(cache_dir, 'license.json')
 
+---@type FzfLuaOverlaySpec
 local M = {}
 
 M.name = 'fzf_exec'
 
-M.prompt = 'license> '
-
 M.opts = {
+  prompt = 'license> ',
   actions = {
     ['default'] = function(selected)
       local util = require('fzf-lua-overlay.util')

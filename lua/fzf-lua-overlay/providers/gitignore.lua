@@ -1,3 +1,4 @@
+---@type FzfLuaOverlaySpec
 local M = {}
 
 local url = 'https://api.github.com/gitignore/templates'

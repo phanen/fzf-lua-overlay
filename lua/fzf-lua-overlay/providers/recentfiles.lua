@@ -1,3 +1,4 @@
+---@type FzfLuaOverlaySpec
 local M = {}
 
 -- simple lru (recent closed filename)
@@ -41,6 +42,7 @@ end
 -- end
 
 -- export for init setup or whatever
+---@diagnostic disable-next-line: inject-field
 M._ = {}
 M._.lru_access = lru_access
 M._.lru_foreach = lru_foreach

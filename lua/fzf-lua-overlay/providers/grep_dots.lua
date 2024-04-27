@@ -1,3 +1,4 @@
+---@type FzfLuaOverlaySpec
 local M = {}
 
 local cfg = require('fzf-lua-overlay.config').opts

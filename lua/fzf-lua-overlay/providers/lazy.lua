@@ -1,3 +1,4 @@
+---@type FzfLuaOverlaySpec
 local M = {}
 
 local lazy_cfg = package.loaded['lazy.core.config']
