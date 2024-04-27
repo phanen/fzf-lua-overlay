@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 April 26
+*fzf-lua-overlay.txt*      For Neovim >= 0.8.0      Last change: 2024 April 27
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -6,6 +6,7 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 1. fzf-lua-overlay                           |fzf-lua-overlay-fzf-lua-overlay|
   - features                        |fzf-lua-overlay-fzf-lua-overlay-features|
   - usage                              |fzf-lua-overlay-fzf-lua-overlay-usage|
+  - config                            |fzf-lua-overlay-fzf-lua-overlay-config|
   - credit                            |fzf-lua-overlay-fzf-lua-overlay-credit|
   - todo                                |fzf-lua-overlay-fzf-lua-overlay-todo|
 2. Links                                               |fzf-lua-overlay-links|
@@ -13,9 +14,8 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 ==============================================================================
 1. fzf-lua-overlay                           *fzf-lua-overlay-fzf-lua-overlay*
 
-<https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml>
-
-Strong defaults and new pickers for fzf-lua.
+<https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml> Strong
+defaults and new pickers for fzf-lua.
 
 mp4: showcase
 <https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d>
@@ -23,12 +23,13 @@ mp4: showcase
 
 FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
 
-- recent files (`vim.v.oldfiles` + recent closed files)
-- `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
-- zoxide integration for `chdir` actions
-- misc: rtp, scriptnames, gitignore/license template
-- notes/dotfiles management
-- …
+- wrapper for all fzf-lua’s builtin pickers (support visual selection support, and accept the same options)
+- new pickers
+    - recent files (`vim.v.oldfiles` + recent closed files)
+    - `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
+    - zoxide integration for `chdir` actions
+    - notes/dotfiles management
+    - runtimepath, scriptnames, gitignore, license
 
 
 USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
@@ -36,7 +37,6 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
 
   <https://github.com/phanen/.dotfiles/blob/master/.config/nvim/lua/pack/fzf.lua>
 >lua
-    -- it has been lazy-load by default, but whatever we use this for which-key popup descriptions
     local fl = setmetatable({}, {
       __index = function(_, k)
         return ([[<cmd>lua require('fzf-lua-overlay').%s()<cr>]]):format(k)
@@ -44,48 +44,44 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
     })
     
     return {
-      'phanen/fzf-lua-overlay',
-      cmd = "FLO",
-      init = function()
-        require('fzf-lua-overlay.providers.recentfiles').init()
-      end,
-      dependencies = { 'ibhagwan/fzf-lua' },
-      -- stylua: ignore
-      keys = {
-        { '<c-b>',         fl.buffers,               mode = { 'n', 'x' } },
-        { '+<c-f>',        fl.plugins,               mode = { 'n', 'x' } },
-        { '<c-l>',         fl.files,                 mode = { 'n', 'x' } },
-        { '<c-n>',         fl.live_grep_native,      mode = { 'n', 'x' } },
-        { '<c-x><c-b>',    fl.complete_bline,        mode = 'i' },
-        { '<c-x><c-f>',    fl.complete_file,         mode = 'i' },
-        { '<c-x><c-p>',    fl.complete_path,         mode = 'i' },
-        { '+e',            fl.grep_notes,            mode = { 'n' } },
-        { '+fr',           fl.rtp,                   mode = { 'n', 'x' } },
-        { '+fs',           fl.scriptnames,           mode = { 'n', 'x' } },
-        { 'gd',            fl.lsp_definitions,       mode = { 'n', 'x' } },
-        { 'gh',            fl.lsp_code_actions,      mode = { 'n', 'x' } },
-        { 'gr',            fl.lsp_references,        mode = { 'n', 'x' } },
-        { '<leader><c-f>', fl.zoxide,                mode = { 'n', 'x' } },
-        { '<leader><c-j>', fl.todo_comment,          mode = { 'n', 'x' } },
-        { '<leader>e',     fl.find_notes,            mode = { 'n', 'x' } },
-        { '<leader>fa',    fl.builtin,               mode = { 'n', 'x' } },
-        { '<leader>fc',    fl.awesome_colorschemes,  mode = { 'n', 'x' } },
-        { '<leader>f;',    fl.command_history,       mode = { 'n', 'x' } },
-        { '<leader>fh',    fl.help_tags,             mode = { 'n', 'x' } },
-        { '<leader>fj',    fl.live_grep_dots,        mode = { 'n', 'x' } },
-        { '<leader>fk',    fl.keymaps,               mode = { 'n', 'x' } },
-        { '<leader>/',     fl.blines,                mode = { 'n', 'x' } },
-        { '<leader> ',     fl.resume,                mode = 'n' },
-        { '<leader>;',     fl.spell_suggest,         mode = { 'n', 'x' } },
-        { '<leader>fo',    fl.recentfiles,           mode = { 'n', 'x' } },
-        { '<leader>fs',    fl.lsp_document_symbols,  mode = { 'n', 'x' } },
-        { '<leader>fw',    fl.lsp_workspace_symbols, mode = { 'n', 'x' } },
-        { '<leader>gd',    fl.lsp_typedefs,          mode = { 'n', 'x' } },
-        { '<leader>l',     fl.find_dots,             mode = { 'n', 'x' } },
-        { '+l',            fl.grep_dots,             mode = { 'n' } },
+      {
+    
+        'phanen/fzf-lua-overlay',
+        cond = not vim.g.vscode,
+        init = function() require('fzf-lua-overlay').init() end,
+        -- stylua: ignore
+        keys = {
+          -- try new pickers
+          { '+<c-f>',        fl.lazy,                  mode = { 'n', 'x' } },
+          { '+e',            fl.grep_notes,            mode = { 'n' } },
+          { "+fi",           fl.gitignore,             mode = { 'n', 'x' } },
+          { "+fl",           fl.license,               mode = { 'n', 'x' } },
+          { '+fr',           fl.rtp,                   mode = { 'n', 'x' } },
+          { '+fs',           fl.scriptnames,           mode = { 'n', 'x' } },
+          { '<leader><c-f>', fl.zoxide,                mode = { 'n', 'x' } },
+          { '<leader><c-j>', fl.todo_comment,          mode = { 'n', 'x' } },
+          { '<leader>e',     fl.find_notes,            mode = { 'n', 'x' } },
+          { '<leader>fo',    fl.recentfiles,           mode = { 'n', 'x' } },
+          { '<leader>l',     fl.find_dots,             mode = { 'n', 'x' } },
+          { '<leader>t',     fl.todos,                 mode = { 'n', 'x' } },
+          { '+l',            fl.grep_dots,             mode = { 'n', 'x' } },
+    
+          -- all fzf-lua's builtin pickers work transparently with visual mode support
+          { '<c-b>',         fl.buffers,               mode = { 'n', 'x' } },
+          { '<c-l>',         fl.files,                 mode = { 'n', 'x' } },
+          { '<c-n>',         fl.live_grep_native,      mode = { 'n', 'x' } },
+        },
+        opts = {},
       },
+      -- config fzf-lua still work well
+      { 'ibhagwan/fzf-lua', cmd = { 'FzfLua' }, opts = {} },
     }
 <
+
+
+CONFIG                                *fzf-lua-overlay-fzf-lua-overlay-config*
+
+- <https://github.com/phanen/fzf-lua-overlay/blob/master/lua/fzf-lua-overlay/config.lua>
 
 
 CREDIT                                *fzf-lua-overlay-fzf-lua-overlay-credit*
