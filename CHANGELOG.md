@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/phanen/fzf-lua-overlay/compare/v1.8.1...v1.8.2) (2024-04-27)
+
+
+### Bug Fixes
+
+* avoid spam ([469e0f1](https://github.com/phanen/fzf-lua-overlay/commit/469e0f1cc4e89171f5fd334d820e937ddbe2a5c9))
+
 ## [1.8.1](https://github.com/phanen/fzf-lua-overlay/compare/v1.8.0...v1.8.1) (2024-04-21)
 
 
