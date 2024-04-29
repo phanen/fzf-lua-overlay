@@ -21,6 +21,13 @@ M.opts = {
       local path = selected[1]:match '/.+'
       require('fzf-lua').live_grep_native { cwd = path }
     end,
+    ['ctrl-d'] = {
+      fn = function(selected)
+        local path = selected[1]:match '/.+'
+        vim.system { 'zoxide', 'remove', path }
+      end,
+      reload = true,
+    },
   },
 }
 
