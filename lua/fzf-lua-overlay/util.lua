@@ -92,4 +92,18 @@ u.gitroot = function(bufname)
   return root
 end
 
+u.get_lazy_plugins = function()
+  -- https://github.com/folke/lazy.nvim/blob/d3974346b6cef2116c8e7b08423256a834cb7cbc/lua/lazy/view/render.lua#L38-L40
+  -- TODO: throttle...
+  local cfg = package.loaded['lazy.core.config']
+  local plugins = vim.tbl_extend('keep', {}, cfg.plugins, cfg.to_clean, cfg.spec.disabled)
+
+  -- kind="clean" seems not named in table
+  for i, p in ipairs(plugins) do
+    plugins[p.name] = p
+    plugins[i] = nil
+  end
+  return plugins
+end
+
 return u
