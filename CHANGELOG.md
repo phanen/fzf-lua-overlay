@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.9.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.8.2...v1.9.0) (2024-05-05)
+
+
+### Features
+
+* add todos in notes query ([777c4fd](https://github.com/phanen/fzf-lua-overlay/commit/777c4fda6cefe034ffa425acee8a2fef0a07e737))
+* vscode-like display for dotfiles ([6383536](https://github.com/phanen/fzf-lua-overlay/commit/6383536474db95bcb58f132569940b40164b21c8))
+* zoxide delete path ([a3b5a00](https://github.com/phanen/fzf-lua-overlay/commit/a3b5a00940424ed636d33d53326adb2a4c5b4b32))
+
 ## [1.8.2](https://github.com/phanen/fzf-lua-overlay/compare/v1.8.1...v1.8.2) (2024-04-27)
 
 
