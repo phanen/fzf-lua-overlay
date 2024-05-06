@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.9.0...v1.10.0) (2024-05-05)
+
+
+### Features
+
+* show all plugins and better actions fallback ([c06d639](https://github.com/phanen/fzf-lua-overlay/commit/c06d639492adc3a1208063b83e7d8bb9b3285013))
+
 ## [1.9.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.8.2...v1.9.0) (2024-05-05)
 
 
