@@ -80,34 +80,51 @@ M.file_create_open = function(_, opts)
   vim.cmd.e(path)
 end
 
+local delete_files = function(paths)
+  for _, path in pairs(paths) do
+    if vim.uv.fs_stat(path) then
+      vim.uv.fs_unlink(path)
+      vim.notify(('%s has been deleted'):format(path), vim.log.levels.INFO)
+    end
+  end
+end
+
 M.file_delete = function(selected, opts)
-  -- TODO: multi?
-  -- local cwd = opts.cwd or vim.fn.getcwd()
-  -- local path = vim.fn.expand(('%s/%s'):format(cwd, selected[1]))
-  local file = require('fzf-lua').path.entry_to_file(selected[1], opts)
-  local path = file.path
-  local _fn, _opts = opts.__call_fn, opts.__call_opts
-  require('fzf-lua').fzf_exec({ 'YES', 'NO' }, {
-    prompt = ('Delete %s'):format(path),
-    actions = {
-      ['default'] = function(sel)
-        if sel[1] == 'YES' and vim.uv.fs_stat(path) then
-          vim.uv.fs_unlink(path)
-          vim.notify(('%s has been deleted'):format(path), vim.log.levels.INFO)
-        end
-        _fn(_opts)
-      end,
-    },
-  })
+  -- prompt break `reload = true`
+  -- local _fn, _opts = opts.__call_fn, opts.__call_opts
+
+  -- may a log for undo? git reset?
+  local paths = vim.tbl_map(
+    function(v) return require('fzf-lua').path.entry_to_file(v, opts).path end,
+    selected
+  )
+
+  delete_files(paths)
+
+  -- require('fzf-lua').fzf_exec({ 'YES', 'NO' }, {
+  --   prompt = ('Delete %s'):format(table.concat(paths, ' ')),
+  --   actions = {
+  --     ['default'] = function(sel)
+  --       if sel[1] == 'YES' then delete_files(paths) end
+  --       -- _fn(_opts)
+  --     end,
+  --   },
+  -- })
+
+  -- vim.ui.select({ 'y', 'n' }, {
+  --   prompt = 'delete or not?',
+  --   -- format_item = function(item) end,
+  -- }, function(choice)
+  --   if not choice:match('n') then delete_files(paths) end
+  -- end)
 end
 
 -- used by fzf's builtin file pickers
 M.file_rename = function(selected, opts)
-  local file = require('fzf-lua').path.entry_to_file(selected[1], opts)
-  local oldpath = file.path
+  -- FIXME: no cursor????
+  local oldpath = require('fzf-lua').path.entry_to_file(selected[1], opts).path
   local oldname = vim.fs.basename(oldpath)
-  local newname = vim.fn.input('New name: ', oldname)
-  newname = vim.trim(newname)
+  local newname = vim.trim(vim.fn.input('New name: ', oldname))
   if newname == '' or newname == oldname then return end
   local cwd = opts.cwd or vim.fn.getcwd()
   local newpath = ('%s/%s'):format(cwd, newname)
