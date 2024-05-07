@@ -57,14 +57,30 @@ M.create_whatever = function(_, opts)
 
   -- create, then open
   if not vim.uv.fs_stat(path) then
-    local ok = u.write_file(path, nil, 'w')
+    vim.fn.mkdir(vim.fn.fnamemodify(path, ':p:h'), 'p')
+    local ok = u.write_file(path)
     if not ok then return vim.notify(('fail to create %s'):format(path)) end
   end
   vim.cmd.e(path)
   vim.notify(('%s created'):format(query), vim.log.levels.INFO)
 end
 
-M.delete_files = function(selected, opts)
+-- open file (create if not exist)
+M.file_create_open = function(_, opts)
+  local query = require('fzf-lua').get_last_query()
+  if print then return vim.print(opts) end
+  local path = vim.fn.expand(('%s/%s'):format(opts.cwd or vim.uv.cwd(), query))
+
+  if not vim.uv.fs_stat(path) then
+    vim.fn.mkdir(vim.fn.fnamemodify(path, ':p:h'), 'p')
+    local ok = u.write_file(path)
+    if not ok then return vim.notify(('fail to create %s'):format(path)) end
+  end
+
+  vim.cmd.e(path)
+end
+
+M.file_delete = function(selected, opts)
   -- TODO: multi?
   -- local cwd = opts.cwd or vim.fn.getcwd()
   -- local path = vim.fn.expand(('%s/%s'):format(cwd, selected[1]))
@@ -86,7 +102,7 @@ M.delete_files = function(selected, opts)
 end
 
 -- used by fzf's builtin file pickers
-M.rename_files = function(selected, opts)
+M.file_rename = function(selected, opts)
   local file = require('fzf-lua').path.entry_to_file(selected[1], opts)
   local oldpath = file.path
   local oldname = vim.fs.basename(oldpath)
