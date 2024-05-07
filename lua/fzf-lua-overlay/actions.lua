@@ -1,5 +1,8 @@
 local M = {}
 
+local cfg = require('fzf-lua-overlay.config').opts
+local u = require('fzf-lua-overlay.util')
+
 M.toggle_daily = function(_, opts)
   local o = opts.__call_opts
   if opts.show_daily_only then
@@ -11,28 +14,54 @@ M.toggle_daily = function(_, opts)
   opts.__call_fn(o)
 end
 
-M.create_notes = function(_, opts)
+-- create notes, snips or todos
+M.create_whatever = function(_, opts)
   local query = require('fzf-lua').get_last_query()
-  -- no input then use date as name
   if not query or query == '' then query = os.date('%m-%d') .. '.md' end
-  -- no ext -> append `.md`
-  local path = vim.fn.expand(('%s/%s'):format(opts.cwd, query))
-  local sec = vim.split(query, ' ', { trimempty = true })
-  local sec_nr = #sec
+  local parts = vim.split(query, ' ', { trimempty = true })
+  local part_nr = #parts
+  if part_nr == 0 then return end
 
-  if sec_nr == 0 then return end
-  if sec_nr > 1 then return require('fzf-lua-overlay.actions').add_todos(query) end
+  -- multi fields, append todo
+  if part_nr > 1 then
+    return (function()
+      local tag = parts[1]
+      local content = table.concat(parts, ' ', 2)
+      local path = vim.fn.expand(vim.fs.joinpath(cfg.todo_dir, tag)) .. '.md'
+      content = ('* %s\n'):format(content)
+      local ok = u.write_file(path, content, 'a')
+      if not ok then return vim.notify('fail to write to storage', vim.log.levels.WARN) end
+    end)()
+  end
 
-  -- non-suffix are md by default
-  if #(vim.split(sec[1], '.', { plain = true })) == 1 then path = path .. '.md' end
+  -- query as path
+  local path_parts = vim.split(query, '.', { plain = true, trimempty = true })
 
+  if #path_parts == 0 then
+    return -- dot only
+  end
+
+  -- complete name default to md
+  if #path_parts == 1 then
+    query = query .. 'md'
+    path_parts[2] = 'md'
+  end
+
+  -- router (query can be `a/b/c`)
+  local path
+  if path_parts[2] == 'md' then
+    path = vim.fn.expand(('%s/%s'):format(opts.cwd, query))
+  else
+    path = vim.fn.expand(('%s/%s'):format(cfg.snip_dir, query))
+  end
+
+  -- create, then open
   if not vim.uv.fs_stat(path) then
-    local u = require('fzf-lua-overlay.util')
     local ok = u.write_file(path, nil, 'w')
-    if not ok then return vim.notify(('fail to create file %s'):format(path)) end
+    if not ok then return vim.notify(('fail to create %s'):format(path)) end
   end
   vim.cmd.e(path)
-  vim.notify(('%s has been created'):format(path), vim.log.levels.INFO)
+  vim.notify(('%s created'):format(query), vim.log.levels.INFO)
 end
 
 M.delete_files = function(selected, opts)
@@ -68,21 +97,6 @@ M.rename_files = function(selected, opts)
   local newpath = ('%s/%s'):format(cwd, newname)
   vim.uv.fs_rename(oldpath, newpath)
   vim.notify(('%s has been renamed to %s'):format(oldpath, newpath), vim.log.levels.INFO)
-end
-
-M.add_todos = function(query)
-  local line = query or require('fzf-lua').get_last_query()
-  local tag, content = unpack(vim.split(line, ': '))
-  if not tag or not content then
-    return vim.notify('format should be [tag: content]', vim.log.levels.WARN)
-  end
-  local u = require('fzf-lua-overlay.util')
-
-  local cfg = require('fzf-lua-overlay.config').opts
-  local filename = vim.fs.normalize(vim.fs.joinpath(cfg.todo_dir, tag)) .. '.md'
-  content = ('* %s\n'):format(content)
-  local ok = u.write_file(filename, content, 'a')
-  if not ok then return vim.notify('fail to write to storage', vim.log.levels.WARN) end
 end
 
 return M

@@ -55,6 +55,7 @@ u.read_file = function(path)
 end
 
 u.write_file = function(path, str, flag)
+  vim.fn.mkdir(vim.fn.fnamemodify(path, ':p:h'), 'p')
   local fd = io.open(path, flag or 'w')
   if not fd then return false end
   if str then fd:write(str) end

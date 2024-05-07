@@ -42,7 +42,6 @@ return {
       { '<leader>e',     fl.find_notes,            mode = { 'n', 'x' } },
       { '<leader>fo',    fl.recentfiles,           mode = { 'n', 'x' } },
       { '<leader>l',     fl.find_dots,             mode = { 'n', 'x' } },
-      { '<leader>t',     fl.todos,                 mode = { 'n', 'x' } },
       { '+l',            fl.grep_dots,             mode = { 'n', 'x' } },
 
       -- all fzf-lua's builtin pickers work transparently with visual mode support

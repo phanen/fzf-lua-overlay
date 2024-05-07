@@ -14,7 +14,7 @@ M.opts = {
       local last_query = require('fzf-lua').get_last_query()
       return require('fzf-lua-overlay').grep_notes({ query = last_query })
     end,
-    ['ctrl-n'] = function(...) require('fzf-lua-overlay.actions').create_notes(...) end,
+    ['ctrl-n'] = function(...) require('fzf-lua-overlay.actions').create_whatever(...) end,
     ['ctrl-x'] = function(...) require('fzf-lua-overlay.actions').delete_files(...) end,
   },
   fzf_opts = { ['--history'] = notes_history },
