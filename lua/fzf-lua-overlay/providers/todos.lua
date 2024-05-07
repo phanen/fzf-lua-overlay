@@ -8,7 +8,7 @@ local M = {}
 M.name = 'files'
 
 M.opts = {
-  cwd = cfg.todos_dir,
+  cwd = cfg.todo_dir,
   winopts = { preview = { hidden = 'nohidden' } },
   actions = {
     ['ctrl-g'] = function(...) end,

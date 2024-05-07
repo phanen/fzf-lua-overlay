@@ -79,7 +79,7 @@ M.add_todos = function(query)
   local u = require('fzf-lua-overlay.util')
 
   local cfg = require('fzf-lua-overlay.config').opts
-  local filename = vim.fs.normalize(vim.fs.joinpath(cfg.todos_dir, tag)) .. '.md'
+  local filename = vim.fs.normalize(vim.fs.joinpath(cfg.todo_dir, tag)) .. '.md'
   content = ('* %s\n'):format(content)
   local ok = u.write_file(filename, content, 'a')
   if not ok then return vim.notify('fail to write to storage', vim.log.levels.WARN) end

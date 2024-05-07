@@ -7,7 +7,7 @@ local M = {}
 M.name = 'live_grep_native'
 
 M.opts = {
-  cwd = cfg.notes_dir,
+  cwd = cfg.note_dir,
   actions = {
     ['ctrl-g'] = function()
       local last_query = require('fzf-lua').get_last_query()
