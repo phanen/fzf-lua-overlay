@@ -14,7 +14,7 @@ function lazy_previewer:cmdline(o)
   self.cwd = lazy_cfg.options.root
 
   -- item can be a fullname or just a plugin name
-  local act = require('fzf-lua.shell').raw_preview_action_cmd(function(items, _)
+  local act = require('fzf-lua').shell.raw_preview_action_cmd(function(items, _)
     local slices = vim.split(items[1], '/')
     local repo = slices[#slices]
     local plugins = require('fzf-lua-overlay.util').get_lazy_plugins()

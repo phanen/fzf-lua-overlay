@@ -2,7 +2,7 @@ local M = {}
 
 M.opts = {
   dot_dir = '~',
-  dot_dirs = { '~', '~/b/stage/' },
+  dot_dirs = { '~', '~/extra/' },
   note_dir = '~/notes',
   todo_dir = '~/notes/todo/',
   snip_dir = '~/notes/snip/',

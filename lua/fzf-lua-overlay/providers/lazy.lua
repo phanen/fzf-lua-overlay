@@ -30,6 +30,21 @@ local p_do = function(cb, prop_name)
   end
 end
 
+-- mt ver...
+---@param cb fun(prop_name: string?, p_name: string, plugins)
+local ps_do = function(cb, prop_name)
+  return function(selected)
+    for _, sel in ipairs(selected) do
+      local slices = vim.split(sel, '/')
+      local name = slices[#slices]
+      local plugins = require('fzf-lua-overlay.util').get_lazy_plugins()
+      local plugin = plugins[name] or {}
+      local prop = prop_name and plugin[prop_name] or nil
+      cb(prop, name, plugin)
+    end
+  end
+end
+
 local toggle_fullname = function()
   require('fzf-lua').fzf_exec(
     function(fzf_cb)
@@ -75,9 +90,11 @@ M.opts = {
       else
         -- TODO: no api for non-loaded plugins...
         -- vim.cmd.Lazy('install ' .. name)
+        -- check it out by rg + query, or manual clone it
+        vim.notify('not installed\n', vim.log.levels.WARN)
       end
     end, 'dir'),
-    ['ctrl-o'] = p_do(function(url, _, plugin)
+    ['ctrl-o'] = ps_do(function(url, _, plugin)
       -- cleaned plugin has not url, so we search it
       if not url then url = ('https://github.com/search?q=%s'):format(plugin.name) end
       vim.ui.open(url)

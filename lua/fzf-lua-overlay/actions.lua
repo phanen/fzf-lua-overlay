@@ -43,7 +43,7 @@ M.create_whatever = function(_, opts)
 
   -- complete name default to md
   if #path_parts == 1 then
-    query = query .. 'md'
+    query = query .. '.md'
     path_parts[2] = 'md'
   end
 
@@ -68,15 +68,12 @@ end
 -- open file (create if not exist)
 M.file_create_open = function(_, opts)
   local query = require('fzf-lua').get_last_query()
-  if print then return vim.print(opts) end
   local path = vim.fn.expand(('%s/%s'):format(opts.cwd or vim.uv.cwd(), query))
-
   if not vim.uv.fs_stat(path) then
     vim.fn.mkdir(vim.fn.fnamemodify(path, ':p:h'), 'p')
     local ok = u.write_file(path)
     if not ok then return vim.notify(('fail to create %s'):format(path)) end
   end
-
   vim.cmd.e(path)
 end
 
