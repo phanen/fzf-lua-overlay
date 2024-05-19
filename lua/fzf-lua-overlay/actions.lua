@@ -135,4 +135,24 @@ M.toggle_mode = function(from_cb, to_cb, to_opts, toggle_key)
   require('fzf-lua').fzf_exec(to_cb, to_opts)
 end
 
+-- maybe useful
+-- `reload = true`, or `exec_silent = true`
+M.file_edit_bg = function(selected, opts)
+  for _, sel in ipairs(selected) do
+    local file = require('fzf-lua').path.entry_to_file(sel, opts)
+    local path = vim.fn.fnamemodify(file.path, ':p')
+    local is_opened = vim.iter(vim.api.nvim_list_bufs()):any(function(bufnr)
+      print(vim.api.nvim_buf_get_name(bufnr))
+      vim.iter(vim.api.nvim_list_bufs()):map(function(v) vim.api.nvim_buf_get_name(v) end):totable()
+      return vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_buf_get_name(bufnr) == path
+    end)
+
+    if not is_opened then
+      local bufnr = vim.api.nvim_create_buf(true, false)
+      vim.api.nvim_buf_set_name(bufnr, path)
+      vim.api.nvim_buf_call(bufnr, vim.cmd.edit)
+    end
+  end
+end
+
 return M
