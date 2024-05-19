@@ -129,4 +129,10 @@ M.file_rename = function(selected, opts)
   vim.notify(('%s has been renamed to %s'):format(oldpath, newpath), vim.log.levels.INFO)
 end
 
+M.toggle_mode = function(from_cb, to_cb, to_opts, toggle_key)
+  local go_back = { actions = { [toggle_key or 'ctrl-g'] = from_cb } }
+  to_opts = vim.tbl_deep_extend('force', to_opts, go_back)
+  require('fzf-lua').fzf_exec(to_cb, to_opts)
+end
+
 return M

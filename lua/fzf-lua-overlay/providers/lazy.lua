@@ -1,118 +1,105 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
-
-local lazy_previewer = require('fzf-lua-overlay.previewers.lazy')
-
 M.name = 'fzf_exec'
 
-M.fzf_exec_arg = function(fzf_cb)
-  coroutine.wrap(function()
-    local co = coroutine.running()
-    local plugins = require('fzf-lua-overlay.util').get_lazy_plugins()
-    for p_name in pairs(plugins) do
-      fzf_cb(p_name, function() coroutine.resume(co) end)
-      coroutine.yield()
-    end
-    fzf_cb()
-  end)()
-end
+-- tbh lazy load is not necessary now, just use alias here
+local u = require('fzf-lua-overlay.util')
+local a = require('fzf-lua-overlay.actions')
+local f = require('fzf-lua-overlay')
 
--- helper to run cb on parsed selected plugins
----@param cb fun(prop_name: string?, p_name: string, plugins)
-local p_do = function(cb, prop_name)
-  return function(selected)
-    local slices = vim.split(selected[1], '/')
-    local name = slices[#slices]
-    local plugins = require('fzf-lua-overlay.util').get_lazy_plugins()
-    local plugin = plugins[name] or {}
-    local prop = prop_name and plugin[prop_name] or nil
-    cb(prop, name, plugin)
-  end
-end
-
--- mt ver...
----@param cb fun(prop_name: string?, p_name: string, plugins)
-local ps_do = function(cb, prop_name)
-  return function(selected)
-    for _, sel in ipairs(selected) do
-      local slices = vim.split(sel, '/')
-      local name = slices[#slices]
-      local plugins = require('fzf-lua-overlay.util').get_lazy_plugins()
-      local plugin = plugins[name] or {}
-      local prop = prop_name and plugin[prop_name] or nil
-      cb(prop, name, plugin)
-    end
-  end
-end
-
-local toggle_fullname = function()
-  require('fzf-lua').fzf_exec(
-    function(fzf_cb)
-      coroutine.wrap(function()
-        local co = coroutine.running()
-        local plugins = require('fzf-lua-overlay.util').get_lazy_plugins()
-        for _, p_spec in pairs(plugins) do
-          local fullname = p_spec[1]
-          if not fullname then
-            local url = p_spec.url
-            -- give a dummy name for "clean" plugins
-            if not url then
-              fullname = 'unknown/' .. p_spec.name
-            else
-              local url_slice = vim.split(url, '/')
-              local username = url_slice[#url_slice - 1]
-              local repo = url_slice[#url_slice]
-              fullname = username .. '/' .. repo
-            end
-          end
-          fzf_cb(fullname, function() coroutine.resume(co) end)
+---define how to show the plugins
+---@param filter fun(p):boolean
+---@param display fun(p):string
+local actions_builder = function(filter, display)
+  return function(fzf_cb)
+    -- nil/false -> use default, true -> resume
+    -- TODO: idealy, to retrieve selected back, when provide a display, we need its reversion (encoder+decoder)
+    -- for fzf-lua, it's done in previewer side
+    -- or just use fzf's `-d` + `--with-nth`, though more limited
+    coroutine.wrap(function()
+      local co = coroutine.running()
+      -- stylua: ignore
+      vim.iter(u.get_lazy_plugins())
+        :filter(filter)
+        :each(function(_, p)
+          fzf_cb(display(p), function() coroutine.resume(co) end)
           coroutine.yield()
-        end
-        fzf_cb()
-      end)()
-    end,
-    vim.tbl_deep_extend(
-      'force',
-      M.opts,
-      { actions = { ['ctrl-g'] = require('fzf-lua-overlay').lazy } }
-    )
-  )
+        end)
+      fzf_cb()
+    end)()
+  end
+end
+
+local display_repo = function(p)
+  local fullname = p[1]
+  if not fullname then
+    local url = p.url
+    if not url then
+      fullname = 'unknown/' .. p.name -- dummy name
+    else
+      local url_slice = vim.split(url, '/')
+      local username = url_slice[#url_slice - 1]
+      local repo = url_slice[#url_slice]
+      fullname = username .. '/' .. repo
+    end
+  end
+  return fullname
+end
+
+local all_name = actions_builder(function() return true end, function(p) return p.name end)
+local all_repo = actions_builder(function() return true end, display_repo)
+
+M.fzf_exec_arg = all_name
+
+-- sequentially run cb on selected (plugins)
+---@param cb fun(plugins)
+local p_do = function(cb, limit)
+  if not limit then
+    limit = 1
+  elseif limit < 0 then
+    limit = math.huge
+  end
+  return function(selected)
+    vim.iter(selected):take(limit):each(function(sel)
+      local bs_parts = vim.split(sel, '/')
+      local name = bs_parts[#bs_parts]
+      local plugin = u.get_lazy_plugins(name)
+      cb(plugin)
+    end)
+  end
 end
 
 M.opts = {
   prompt = 'lazy> ',
-  previewer = lazy_previewer,
+  previewer = require('fzf-lua-overlay.previewers.lazy'),
   actions = {
-    ['default'] = p_do(function(dir, name, plugin)
-      vim.print(plugin)
-      if plugin._.installed then
-        require('fzf-lua-overlay.util').chdir(dir)
-      else
-        -- TODO: no api for non-loaded plugins...
-        -- vim.cmd.Lazy('install ' .. name)
-        -- check it out by rg + query, or manual clone it
-        vim.notify('not installed\n', vim.log.levels.WARN)
-      end
-    end, 'dir'),
-    ['ctrl-o'] = ps_do(function(url, _, plugin)
-      -- cleaned plugin has not url, so we search it
-      if not url then url = ('https://github.com/search?q=%s'):format(plugin.name) end
+    ['default'] = p_do(function(p)
+      local dir = p.dir
+      if dir and vim.uv.fs_stat(dir) then u.chdir(dir) end
+    end),
+    ['ctrl-o'] = p_do(function(p) -- search cleaned plugins
+      local url = p.url or ('https://github.com/search?q=%s'):format(p.name)
       vim.ui.open(url)
-    end, 'url'),
-    ['ctrl-l'] = p_do(function(dir)
-      if dir then require('fzf-lua').files { cwd = dir } end
-    end, 'dir'),
-    ['ctrl-n'] = p_do(function(dir) require('fzf-lua').live_grep_native { cwd = dir } end, 'dir'),
-    ['ctrl-r'] = p_do(function(_, name, plugin)
-      if plugin._ and plugin._.loaded then
-        vim.notify('Reload ' .. name, vim.log.levels.WARN)
-        require('lazy.core.loader').reload(plugin)
+    end, -1),
+    -- TODO: ps_do
+    ['ctrl-l'] = p_do(function(p)
+      if p.dir and vim.uv.fs_stat(p.dir) then require('fzf-lua').files { cwd = p.dir } end
+    end),
+    ['ctrl-n'] = p_do(function(p)
+      if p.dir then require('fzf-lua').live_grep_native { cwd = p.dir } end
+    end),
+    ['ctrl-r'] = p_do(function(p)
+      if p._ and p._.loaded then
+        u.warn('Reload %s', p.name)
+        require('lazy.core.loader').reload(p)
       else
-        require('lazy.core.loader').load(plugin, { cmd = 'Lazy load' })
-        -- vim.cmd.Lazy('load ' .. name)
+        u.warn('Load %s', p.name)
+        require('lazy.core.loader').load(p, { cmd = 'Lazy load' })
       end
     end),
-    ['ctrl-g'] = toggle_fullname,
+    -- TODO: support `reload = true`
+    ['ctrl-g'] = function() a.toggle_mode(f.lazy, all_repo, M.opts) end,
+    ['ctrl-x'] = function() a.toggle_mode(f.lazy, all_repo, M.opts, 'ctrl-x') end,
   },
 }
 
