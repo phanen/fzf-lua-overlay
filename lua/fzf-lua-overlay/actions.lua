@@ -50,9 +50,9 @@ M.create_whatever = function(_, opts)
   -- router (query can be `a/b/c`)
   local path
   if path_parts[2] == 'md' then
-    path = vim.fn.expand(('%s/%s'):format(opts.cwd, query))
+    path = vim.fn.expand(vim.fs.joinpath(opts.cwd, query))
   else
-    path = vim.fn.expand(('%s/%s'):format(cfg.snip_dir, query))
+    path = vim.fn.expand(vim.fs.joinpath(cfg.snip_dir, query))
   end
 
   -- create, then open
