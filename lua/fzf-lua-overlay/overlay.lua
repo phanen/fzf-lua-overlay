@@ -1,7 +1,10 @@
 -- local lsp_opt_fn = function() end
 
 local overlay = setmetatable({
-  todo_comment = { name = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
+  todo_comment = {
+    name = 'grep',
+    opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true },
+  },
 }, {
   __index = function(t, k)
     local ok, ret = pcall(require, ('fzf-lua-overlay.providers.%s'):format(k))
