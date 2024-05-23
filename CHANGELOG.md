@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.11.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.10.0...v1.11.0) (2024-05-21)
+
+
+### Features
+
+* a new action to open file in background ([0b9d69c](https://github.com/phanen/fzf-lua-overlay/commit/0b9d69c2c58babf16d8fe9b1c2f720b4599c52ef))
+* cache plugin lists ([b1232b2](https://github.com/phanen/fzf-lua-overlay/commit/b1232b2c084734d72c8f801cd9d9c51cbe3f3a71))
+* plugins do ([9383e8d](https://github.com/phanen/fzf-lua-overlay/commit/9383e8d6b3c789e922990bb08e34f6ec31373e7e))
+
+
+### Bug Fixes
+
+* annoy repeat ([24cfd1d](https://github.com/phanen/fzf-lua-overlay/commit/24cfd1ddb4235caeaf46a64985ecce7a4187a478))
+* disable ui then bulk edit ([8ecd1d5](https://github.com/phanen/fzf-lua-overlay/commit/8ecd1d52bc0452dfaf7dc60d1e87a89d0d1090c8))
+* passtrough resume query ([309c517](https://github.com/phanen/fzf-lua-overlay/commit/309c51757757f428961ea089028d6b54eaed6513))
+* typos ([9383e8d](https://github.com/phanen/fzf-lua-overlay/commit/9383e8d6b3c789e922990bb08e34f6ec31373e7e))
+
 ## [1.10.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.9.0...v1.10.0) (2024-05-05)
 
 
