@@ -113,7 +113,17 @@ end)()
 
 u.warn = function(msg, ...)
   msg = string.format(msg, ...)
-  vim.notify('plugin not installed\n', vim.log.levels.WARN)
+  vim.notify('[Fzf-lua-overlay] ' .. msg, vim.log.levels.WARN)
+end
+
+u.gh_curl = function(url)
+  local content = vim.fn.system { 'curl', '-s', url }
+  content = vim.json.decode(content)
+  -- gh api limit
+  if not content or (content.message and content.message:match('API rate limit exceeded')) then
+    return
+  end
+  return content
 end
 
 return u

@@ -1,7 +1,9 @@
-local url = 'https://api.github.com/licenses'
+local base_url = 'https://api.github.com/licenses'
 
 local cache_dir = require('fzf-lua-overlay.config').opts.cache_dir
 local cache_path = vim.fs.joinpath(cache_dir, 'license.json')
+
+local u = require('fzf-lua-overlay.util')
 
 ---@type FzfLuaOverlaySpec
 local M = {}
@@ -21,8 +23,9 @@ M.opts = {
         local confirm = vim.fn.confirm('Override?', '&Yes\n&No')
         if confirm ~= 1 then return end
       end
-      local template_url = ('%s/%s'):format(url, selected[1])
-      local content = vim.fn.system { 'curl', '-s', template_url }
+      local url = ('%s/%s'):format(base_url, selected[1])
+      local content = u.gh_curl(url)
+      if not content then return u.warn('api limited') end
       content = vim.json.decode(content).body
       util.write_file(path, content)
       vim.cmd.e(path)
@@ -35,7 +38,8 @@ M.fzf_exec_arg = function(fzf_cb)
 
   local json
   if not vim.uv.fs_stat(cache_path) then
-    local json_str = vim.fn.system { 'curl', '-s', url }
+    local json_str = u.gh_curl(base_url)
+    if not json_str then return u.warn('api limited') end
     util.write_file(cache_path, json_str)
     json = vim.json.decode(json_str)
   end
