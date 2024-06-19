@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/phanen/fzf-lua-overlay/compare/v1.11.0...v1.11.1) (2024-06-19)
+
+
+### Bug Fixes
+
+* log on api limited ([105bcdb](https://github.com/phanen/fzf-lua-overlay/commit/105bcdbab1d48d5cc1668e7a84663db80e168a3f))
+
 ## [1.11.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.10.0...v1.11.0) (2024-05-21)
 
 
