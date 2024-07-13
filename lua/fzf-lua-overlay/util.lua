@@ -117,13 +117,11 @@ u.warn = function(msg, ...)
 end
 
 u.gh_curl = function(url)
-  local content = vim.fn.system { 'curl', '-s', url }
-  content = vim.json.decode(content)
+  local str = vim.fn.system { 'curl', '-s', url }
+  local tbl = vim.json.decode(str)
   -- gh api limit
-  if not content or (content.message and content.message:match('API rate limit exceeded')) then
-    return
-  end
-  return content
+  if not tbl or (tbl.message and tbl.message:match('API rate limit exceeded')) then return end
+  return str, tbl
 end
 
 return u

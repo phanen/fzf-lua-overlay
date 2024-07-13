@@ -24,10 +24,10 @@ M.opts = {
         if confirm ~= 1 then return end
       end
       local url = ('%s/%s'):format(base_url, selected[1])
-      local content = u.gh_curl(url)
-      if not content then return u.warn('api limited') end
-      content = vim.json.decode(content).body
-      util.write_file(path, content)
+      local _, tbl = u.gh_curl(url)
+      if not tbl then return u.warn('api limited') end
+      local str = tbl.body
+      util.write_file(path, str)
       vim.cmd.e(path)
     end,
   },
@@ -36,18 +36,18 @@ M.opts = {
 M.fzf_exec_arg = function(fzf_cb)
   local util = require('fzf-lua-overlay.util')
 
-  local json
+  local tbl
   if not vim.uv.fs_stat(cache_path) then
-    local json_str = u.gh_curl(base_url)
-    if not json_str then return u.warn('api limited') end
-    util.write_file(cache_path, json_str)
-    json = vim.json.decode(json_str)
+    local str = u.gh_curl(base_url)
+    if not str then return u.warn('api limited') end
+    util.write_file(cache_path, str)
+    tbl = vim.json.decode(str)
   end
-  json = json or util.read_json(cache_path)
+  tbl = tbl or util.read_json(cache_path)
 
   coroutine.wrap(function()
     local co = coroutine.running()
-    for _, item in ipairs(json) do
+    for _, item in ipairs(tbl) do
       fzf_cb(item.key, function() coroutine.resume(co) end)
       coroutine.yield()
     end
