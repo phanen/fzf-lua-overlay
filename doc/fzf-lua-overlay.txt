@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*       For Neovim >= 0.8.0      Last change: 2024 June 19
+*fzf-lua-overlay.txt*       For Neovim >= 0.8.0      Last change: 2024 July 13
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
