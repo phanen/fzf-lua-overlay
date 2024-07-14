@@ -10,7 +10,7 @@ M.opts = {
   prompt = 'grep_dots> ',
   cwd = cfg.dot_dir,
   cmd = ([[rg %s --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e]]):format(
-    table.concat(cfg.dot_dirs, ' ')
+    table.concat({ cfg.dot_dir }, ' ')
   ),
 }
 

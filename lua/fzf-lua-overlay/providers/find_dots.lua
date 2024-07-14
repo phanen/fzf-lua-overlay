@@ -11,7 +11,7 @@ M.opts = {
   formatter = 'path.filename_first',
   cwd = cfg.dot_dir,
   cmd = ([[rg --color=never --files --hidden %s --follow --no-messages -g "!.git"]]):format(
-    table.concat(cfg.dot_dirs, ' ')
+    table.concat({ cfg.dot_dir }, ' ')
   ),
 }
 
