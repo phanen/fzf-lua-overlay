@@ -1,4 +1,4 @@
-local u = {}
+local M = {}
 
 local getregion = function(mode)
   local sl, sc = vim.fn.line 'v', vim.fn.col 'v'
@@ -33,7 +33,7 @@ local getregion = function(mode)
 end
 
 -- get visual selected with no side effect
-u.getregion = function(mode)
+M.getregion = function(mode)
   mode = mode or vim.api.nvim_get_mode().mode
   if not vim.tbl_contains({ 'v', 'V', '\022' }, mode) then return {} end
   local ok, lines = pcall(vim.fn.getregion, vim.fn.getpos '.', vim.fn.getpos 'v', { type = mode })
@@ -41,20 +41,28 @@ u.getregion = function(mode)
   return getregion(mode)
 end
 
-u.chdir = function(path)
+M.chdir = function(path)
   if vim.fn.executable('zoxide') then vim.system { 'zoxide', 'add', path } end
   vim.api.nvim_set_current_dir(path)
 end
 
-u.read_file = function(path)
-  local fd = io.open(path, 'r')
+M.read_file = function(path, flag)
+  local fd = io.open(path, flag or 'r')
   if not fd then return nil end
   local content = fd:read('*a')
   fd:close()
   return content or ''
 end
 
-u.write_file = function(path, str, flag)
+-- path should normalized
+-- optionally create parent directory
+M.write_file = function(path, str, flag, opts)
+  opts = opts or { auto_create_dir = true }
+  if opts.auto_create_dir then
+    local dir = vim.fs.dirname(path)
+    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir) end
+  end
+
   local fd = io.open(path, flag or 'w')
   if not fd then return false end
   if str then fd:write(str) end
@@ -62,20 +70,20 @@ u.write_file = function(path, str, flag)
   return true
 end
 
-u.read_json = function(path, opts)
+M.read_json = function(path, opts)
   opts = opts or {}
-  local str = u.read_file(path)
+  local str = M.read_file(path)
   local ok, tbl = pcall(vim.json.decode, str, opts)
   return ok and tbl or {}
 end
 
-u.write_json = function(path, tbl)
+M.write_json = function(path, tbl)
   local ok, str = pcall(vim.json.encode, tbl)
   if not ok then return false end
-  return u.write_file(path, str)
+  return M.write_file(path, str)
 end
 
-u.gitroot = function(bufname)
+M.gitroot = function(bufname)
   if not bufname then bufname = vim.api.nvim_buf_get_name(0) end
   local path = vim.fs.dirname(bufname)
   local root = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait().stdout
@@ -93,7 +101,7 @@ u.gitroot = function(bufname)
 end
 
 ---@type fun(name: string?): table<string, any>
-u.get_lazy_plugins = (function()
+M.get_lazy_plugins = (function()
   local plugins
   return function(name)
     if not plugins then
@@ -111,17 +119,54 @@ u.get_lazy_plugins = (function()
   end
 end)()
 
-u.warn = function(msg, ...)
-  msg = string.format(msg, ...)
-  vim.notify('[Fzf-lua-overlay] ' .. msg, vim.log.levels.WARN)
+local log_level = vim.log.levels.WARN
+
+---@return nil
+M.log = function(msg, ...) return vim.notify('[fzf] ' .. msg:format(...), log_level) end
+
+---@deprecated use `M.log` instead
+M.warn = M.log
+
+---@return string
+M.curl = function(url) return vim.fn.system { 'curl', '-sL', url } end
+
+---github restful api
+--- ok -> false, msg
+--- err -> true, str, tbl
+---@param route string
+---@return boolean?, string, table?
+M.gh = function(route)
+  local url = ('https://api.github.com/' .. route)
+  local str = M.curl(url)
+  local ok, tbl = pcall(vim.json.decode, str)
+
+  if not ok or not tbl then --
+    return false, ('parsed json failed on:\n%s'):format(str)
+  end
+  if tbl.message and tbl.message:match('API rate limit exceeded') then
+    return false, ('API error: %s'):format(tbl.message)
+  end
+  return true, str, tbl
 end
 
-u.gh_curl = function(url)
-  local str = vim.fn.system { 'curl', '-s', url }
-  local tbl = vim.json.decode(str)
-  -- gh api limit
-  if not tbl or (tbl.message and tbl.message:match('API rate limit exceeded')) then return end
-  return str, tbl
+---gh but use local cache first
+---(return json only now)
+---@param route string
+---@param path string
+---@param opts table<string, boolean>?
+---@return boolean?, string?, table?
+M.gh_cache = function(route, path, opts)
+  opts = opts or {}
+  if not vim.uv.fs_stat(path) then
+    local ok, err_or_str, tbl = M.gh(route)
+    if ok then
+      local file_ok = M.write_file(path, err_or_str)
+      if not file_ok then return file_ok, 'write failed', tbl end
+    end
+    return ok, err_or_str, tbl
+  else -- perf: `read_file` can be saved...
+    return true, opts.str and M.read_file(path), opts.tbl and M.read_json(path)
+  end
 end
 
-return u
+return M

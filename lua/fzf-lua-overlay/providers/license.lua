@@ -1,12 +1,8 @@
-local base_url = 'https://api.github.com/licenses'
-
-local cache_dir = require('fzf-lua-overlay.config').opts.cache_dir
-local cache_path = vim.fs.joinpath(cache_dir, 'license.json')
-
-local u = require('fzf-lua-overlay.util')
-
 ---@type FzfLuaOverlaySpec
 local M = {}
+
+local cache_dir = require('fzf-lua-overlay.config').opts.cache_dir
+local u = require('fzf-lua-overlay.util')
 
 M.name = 'fzf_exec'
 
@@ -14,37 +10,41 @@ M.opts = {
   prompt = 'license> ',
   actions = {
     ['default'] = function(selected)
-      local util = require('fzf-lua-overlay.util')
-      local gitroot = util.gitroot()
-      if not gitroot then vim.notify('not in a git repository') end
-      local path = vim.fs.joinpath(gitroot, 'LICENSE')
-      vim.print(path)
-      if vim.uv.fs_stat(path) then
-        local confirm = vim.fn.confirm('Override?', '&Yes\n&No')
-        if confirm ~= 1 then return end
+      local root = u.gitroot()
+      if not root then return u.log('not in a git repo') end
+      local paths = { root .. '/LICENSE', root .. '/license' }
+      local path
+      for _, p in ipairs(paths) do
+        if vim.uv.fs_stat(p) then
+          local confirm = vim.fn.confirm('Override?', '&Yes\n&No')
+          if confirm ~= 1 then return end
+          path = p
+          break
+        end
       end
-      local url = ('%s/%s'):format(base_url, selected[1])
-      local _, tbl = u.gh_curl(url)
-      if not tbl then return u.warn('api limited') end
-      local str = tbl.body
-      util.write_file(path, str)
+      vim.print(path)
+
+      local license = selected[1]
+      if not license then return u.log('no filetype') end
+
+      local ok, err_or_str, tbl = u.gh_cache(
+        vim.fs.joinpath('licenses', license),
+        vim.fs.joinpath(cache_dir, 'gitignore', license .. '.json'),
+        { tbl = true }
+      )
+      if not ok or not tbl then return u.log(err_or_str) end
+
+      local content = tbl.body
+      if not content then return u.log('unkown: no body field in json') end
+      u.write_file(path, content)
       vim.cmd.e(path)
     end,
   },
 }
 
 M.fzf_exec_arg = function(fzf_cb)
-  local util = require('fzf-lua-overlay.util')
-
-  local tbl
-  if not vim.uv.fs_stat(cache_path) then
-    local str = u.gh_curl(base_url)
-    if not str then return u.warn('api limited') end
-    util.write_file(cache_path, str)
-    tbl = vim.json.decode(str)
-  end
-  tbl = tbl or util.read_json(cache_path)
-
+  local ok, err_or_str, tbl = u.gh_cache('licenses', cache_dir .. '/license.json', { tbl = true })
+  if not ok or not tbl then return u.log(err_or_str) end
   coroutine.wrap(function()
     local co = coroutine.running()
     for _, item in ipairs(tbl) do
