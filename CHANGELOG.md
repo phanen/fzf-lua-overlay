@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.11.0...v2.0.0) (2024-08-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* bug fixes
+
+### release
+
+* bug fixes ([80984eb](https://github.com/phanen/fzf-lua-overlay/commit/80984ebec5eb3557b1c849b362bdf26c430227cd))
+
+
+### Bug Fixes
+
+* **json:** tbl or str ([7ce78c3](https://github.com/phanen/fzf-lua-overlay/commit/7ce78c359e5010438dd29682af9928e1c51dcd8c))
+* log on api limited ([105bcdb](https://github.com/phanen/fzf-lua-overlay/commit/105bcdbab1d48d5cc1668e7a84663db80e168a3f))
+
 ## [1.11.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.10.0...v1.11.0) (2024-05-21)
 
 
