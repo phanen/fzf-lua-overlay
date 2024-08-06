@@ -1,7 +1,7 @@
 local M = {}
 
-local cfg = require('fzf-lua-overlay.config').opts
-local u = require('fzf-lua-overlay.util')
+local cfg = require('flo').getcfg()
+local u = require('flo.util')
 
 M.toggle_daily = function(_, opts)
   local o = opts.__call_opts
@@ -130,7 +130,8 @@ M.file_rename = function(selected, opts)
 end
 
 M.toggle_mode = function(from_cb, to_cb, to_opts, toggle_key)
-  local go_back = { actions = { [toggle_key or 'ctrl-g'] = from_cb } }
+  -- note: avoid pass incorrect args to from_cb
+  local go_back = { actions = { [toggle_key or 'ctrl-g'] = function() return from_cb() end } }
   to_opts = vim.tbl_deep_extend('force', to_opts, go_back)
   require('fzf-lua').fzf_exec(to_cb, to_opts)
 end
@@ -141,11 +142,10 @@ M.file_edit_bg = function(selected, opts)
   for _, sel in ipairs(selected) do
     local file = require('fzf-lua').path.entry_to_file(sel, opts)
     local path = vim.fn.fnamemodify(file.path, ':p')
-    local is_opened = vim.iter(vim.api.nvim_list_bufs()):any(
-      function(bufnr)
-        return vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_buf_get_name(bufnr) == path
-      end
-    )
+    local is_opened = vim.iter(vim.api.nvim_list_bufs()):any(function(bufnr)
+      vim.iter(vim.api.nvim_list_bufs()):map(vim.api.nvim_buf_get_name):totable()
+      return vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_buf_get_name(bufnr) == path
+    end)
 
     if not is_opened then
       local bufnr = vim.api.nvim_create_buf(true, false)

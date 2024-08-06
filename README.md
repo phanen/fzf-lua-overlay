@@ -18,7 +18,7 @@ Strong defaults and new pickers for fzf-lua.
 ```lua
 local fl = setmetatable({}, {
   __index = function(_, k)
-    return ([[<cmd>lua require('fzf-lua-overlay').%s()<cr>]]):format(k)
+    return ([[<cmd>lua require('flo').%s()<cr>]]):format(k)
   end,
 })
 
@@ -26,8 +26,9 @@ return {
   {
 
     'phanen/fzf-lua-overlay',
+    main = 'flo',
     cond = not vim.g.vscode,
-    init = function() require('fzf-lua-overlay').init() end,
+    init = function() require('flo').init() end,
     -- stylua: ignore
     keys = {
       -- try new pickers

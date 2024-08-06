@@ -20,4 +20,4 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
   return join(list[0],"\n")
 endfunction
 
-command! -nargs=1 -complete=custom,s:fzf_lua_overlay_complete FL lua require('fzf-lua-overlay').<args>()
+command! -nargs=1 -complete=custom,s:fzf_lua_overlay_complete FL lua require('flo').<args>()

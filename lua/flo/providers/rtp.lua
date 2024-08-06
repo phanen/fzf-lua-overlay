@@ -1,7 +1,7 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.name = 'fzf_exec'
+M.api_name = 'fzf_exec'
 
 M.opts = {
   prompt = 'rtp> ',
@@ -9,7 +9,7 @@ M.opts = {
   actions = {
     ['default'] = function(selected)
       local path = selected[1]
-      require('fzf-lua-overlay.util').chdir(path)
+      require('flo.util').chdir(path)
     end,
     ['ctrl-l'] = function(selected)
       local path = selected[1]

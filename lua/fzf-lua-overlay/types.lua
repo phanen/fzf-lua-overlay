@@ -1,4 +1,0 @@
----@class FzfLuaOverlaySpec
----@field name string builtin picker of fzf-lua
----@field opts table
----@field fzf_exec_arg? function|string only used for fzf_exec

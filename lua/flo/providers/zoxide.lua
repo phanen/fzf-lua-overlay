@@ -1,17 +1,17 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.name = 'fzf_exec'
+M.api_name = 'fzf_exec'
 
 M.opts = {
   prompt = 'zoxide> ',
-  preview = 'ls --color {2}',
+  preview = ('%s -lh --color=always {2}'):format(vim.fn.executable('eza') == 1 and 'eza' or 'ls'),
   -- preview = 'onefetch {2}',
   -- preview = 'tokei {2}',
   actions = {
     ['default'] = function(selected)
       local path = selected[1]:match '/.+'
-      require('fzf-lua-overlay.util').chdir(path)
+      require('flo.util').chdir(path)
     end,
     ['ctrl-l'] = function(selected)
       local path = selected[1]:match '/.+'

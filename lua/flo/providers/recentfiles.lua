@@ -2,7 +2,7 @@
 local M = {}
 
 -- simple lru (recent closed filename)
-local session_files = require('fzf-lua-overlay.shared').session_files
+local session_files = require('flo.state').session_files
 local head = { n = nil }
 local tail = { p = head }
 head.n = tail
@@ -47,7 +47,7 @@ M._ = {}
 M._.lru_access = lru_access
 M._.lru_foreach = lru_foreach
 
-M.name = 'fzf_exec'
+M.api_name = 'fzf_exec'
 
 M.opts = {
   prompt = 'recent> ',

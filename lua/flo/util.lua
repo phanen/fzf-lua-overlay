@@ -1,50 +1,24 @@
-local M = {}
+local cache_dir = require('flo').getcfg().cache_dir
 
-local getregion = function(mode)
-  local sl, sc = vim.fn.line 'v', vim.fn.col 'v'
-  local el, ec = vim.fn.line '.', vim.fn.col '.'
-  if sl > el then
-    sl, sc, el, ec = el, ec, sl, sc
-  elseif sl == el and sc > ec then
-    sc, ec = ec, sc
-  end
-  local lines = vim.api.nvim_buf_get_lines(0, sl - 1, el, false)
-  if mode == 'v' then
-    if #lines == 1 then
-      lines[1] = lines[1]:sub(sc, ec)
-    else
-      lines[1] = lines[1]:sub(sc)
-      lines[#lines] = lines[#lines]:sub(1, ec)
-    end
-  elseif mode == '\022' then -- not sure behavior
-    for i, line in pairs(lines) do
-      if #line >= ec then
-        lines[i] = line:sub(sc, ec)
-      elseif #line < sc - 1 then
-        lines[i] = (' '):rep(ec - sc + 1)
-      elseif #line < sc then
-        lines[i] = ''
-      else
-        lines[i] = line:sub(sc, nil)
-      end
-    end
-  end
-  return lines
-end
+local M = {}
 
 -- get visual selected with no side effect
 M.getregion = function(mode)
   mode = mode or vim.api.nvim_get_mode().mode
   if not vim.tbl_contains({ 'v', 'V', '\022' }, mode) then return {} end
-  local ok, lines = pcall(vim.fn.getregion, vim.fn.getpos '.', vim.fn.getpos 'v', { type = mode })
-  if ok then return lines end
-  return getregion(mode)
+  return vim.fn.getregion(vim.fn.getpos '.', vim.fn.getpos 'v', { type = mode })
 end
 
-M.chdir = function(path)
-  if vim.fn.executable('zoxide') then vim.system { 'zoxide', 'add', path } end
-  vim.api.nvim_set_current_dir(path)
-end
+M.chdir = (function()
+  if vim.fn.executable('zoxide') == 1 then
+    return function(path)
+      vim.system { 'zoxide', 'add', path }
+      vim.api.nvim_set_current_dir(path)
+    end
+  else
+    return vim.api.nvim_set_current_dir
+  end
+end)()
 
 M.read_file = function(path, flag)
   local fd = io.open(path, flag or 'r')
@@ -83,21 +57,12 @@ M.write_json = function(path, tbl)
   return M.write_file(path, str)
 end
 
+---@return string?
 M.gitroot = function(bufname)
   if not bufname then bufname = vim.api.nvim_buf_get_name(0) end
   local path = vim.fs.dirname(bufname)
-  local root = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait().stdout
-  if root then
-    root = vim.trim(root)
-  else
-    for dir in vim.fs.parents(bufname) do
-      if vim.fn.isdirectory(dir .. '/.git') == 1 then
-        root = dir
-        break
-      end
-    end
-  end
-  return root
+  local obj = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait()
+  if obj.code == 0 then return vim.trim(obj.stdout) end
 end
 
 ---@type fun(name: string?): table<string, any>
@@ -124,24 +89,23 @@ local log_level = vim.log.levels.WARN
 ---@return nil
 M.log = function(msg, ...) return vim.notify('[fzf] ' .. msg:format(...), log_level) end
 
----@deprecated use `M.log` instead
-M.warn = M.log
-
 ---@return string
 M.curl = function(url) return vim.fn.system { 'curl', '-sL', url } end
 
 ---github restful api
 --- ok -> false, msg
 --- err -> true, str, tbl
----@param route string
----@return boolean?, string, table?
-M.gh = function(route)
-  local url = ('https://api.github.com/' .. route)
-  local str = M.curl(url)
-  local ok, tbl = pcall(vim.json.decode, str)
+M.gh = function(route, opts)
+  local str
+  if vim.fn.executable('gh') == 1 then
+    str = M.curl('https://api.github.com/' .. route)
+  else
+    str = vim.system { 'gh', 'api', route }:wait().stdout
+  end
+  local ok, tbl = pcall(vim.json.decode, str, opts or {})
 
   if not ok or not tbl then --
-    return false, ('parsed json failed on:\n%s'):format(str)
+    return false, ('parse json failed on:\n%s'):format(str)
   end
   if tbl.message and tbl.message:match('API rate limit exceeded') then
     return false, ('API error: %s'):format(tbl.message)
@@ -150,23 +114,47 @@ M.gh = function(route)
 end
 
 ---gh but use local cache first
----(return json only now)
 ---@param route string
 ---@param path string
----@param opts table<string, boolean>?
+---@param opts table? opts for vim.json.decode
 ---@return boolean?, string?, table?
 M.gh_cache = function(route, path, opts)
   opts = opts or {}
   if not vim.uv.fs_stat(path) then
-    local ok, err_or_str, tbl = M.gh(route)
+    local ok, err_or_str, tbl = M.gh(route, opts)
     if ok then
       local file_ok = M.write_file(path, err_or_str)
       if not file_ok then return file_ok, 'write failed', tbl end
     end
     return ok, err_or_str, tbl
-  else -- perf: `read_file` can be saved...
-    return true, opts.str and M.read_file(path), opts.tbl and M.read_json(path)
   end
+  local str = assert(M.read_file(path))
+  local ok, tbl = pcall(vim.json.decode, str, opts)
+  return ok, str, ok and tbl or nil
+end
+
+---also gh_cache, assume the GET response is json (maybe simpler)
+---@param route string
+---@param root string?
+---@param opts table? opts for vim.json.decode
+---@return boolean?, string?, table?
+M.gh_cache_json = function(route, root, opts)
+  root = root or cache_dir
+  opts = opts or {}
+
+  local path = root .. '/' .. route .. '.json'
+  print(route)
+  if not vim.uv.fs_stat(path) then
+    local ok, err_or_str, tbl = M.gh(route, opts)
+    if ok then
+      local file_ok = M.write_file(path, err_or_str)
+      if not file_ok then return file_ok, 'write failed', tbl end
+    end
+    return ok, err_or_str, tbl
+  end
+  local str = assert(M.read_file(path))
+  local ok, tbl = pcall(vim.json.decode, str, opts)
+  return ok, str, ok and tbl or nil
 end
 
 return M

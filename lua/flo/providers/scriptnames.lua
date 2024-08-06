@@ -5,7 +5,7 @@ local file_actions =
 
 local M = {}
 
-M.name = 'fzf_exec'
+M.api_name = 'fzf_exec'
 
 M.opts = {
   prompt = 'scriptnames> ',

@@ -1,19 +1,18 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
-M.name = 'fzf_exec'
+M.api_name = 'fzf_exec'
 
 -- tbh lazy load is not necessary now, just use alias here
-local u = require('fzf-lua-overlay.util')
-local a = require('fzf-lua-overlay.actions')
-local f = require('fzf-lua-overlay')
+local u = require('flo.util')
+local a = require('flo.actions')
+local f = require('flo')
 
 ---define how to show the plugins
 ---@param filter fun(p):boolean
----@param display fun(p):string
-local actions_builder = function(filter, display)
+---@param encode fun(p):string to be displayed on fuzzy results
+local actions_builder = function(filter, encode)
   return function(fzf_cb)
     -- nil/false -> use default, true -> resume
-    -- TODO: idealy, to retrieve selected back, when provide a display, we need its reversion (encoder+decoder)
     -- for fzf-lua, it's done in previewer side
     -- or just use fzf's `-d` + `--with-nth`, though more limited
     coroutine.wrap(function()
@@ -22,7 +21,7 @@ local actions_builder = function(filter, display)
       vim.iter(u.get_lazy_plugins())
         :filter(filter)
         :each(function(_, p)
-          fzf_cb(display(p), function() coroutine.resume(co) end)
+          fzf_cb(encode(p), function() coroutine.resume(co) end)
           coroutine.yield()
         end)
       fzf_cb()
@@ -30,7 +29,7 @@ local actions_builder = function(filter, display)
   end
 end
 
-local display_repo = function(p)
+local disp_repo = function(p)
   local fullname = p[1]
   if not fullname then
     local url = p.url
@@ -47,9 +46,18 @@ local display_repo = function(p)
 end
 
 local all_name = actions_builder(function() return true end, function(p) return p.name end)
-local all_repo = actions_builder(function() return true end, display_repo)
+local all_repo = actions_builder(function() return true end, disp_repo)
 
 M.fzf_exec_arg = all_name
+
+local is_repo
+if false then
+  local all_reloadable = function(fzf_cb)
+    local disp = is_repo and disp_repo or function(p) return p.name end
+    actions_builder(function() return true end, disp)(fzf_cb)
+  end
+  M.fzf_exec_arg = all_reloadable
+end
 
 -- sequentially run cb on selected (plugins)
 ---@param cb fun(plugins)
@@ -69,9 +77,12 @@ local p_do = function(cb, limit)
   end
 end
 
+-- local previewer = require('flo.previewers.lazy').fzf
+local previewer = require('flo.previewers.lazy').builtin
+
 M.opts = {
   prompt = 'lazy> ',
-  previewer = require('fzf-lua-overlay.previewers.lazy'),
+  previewer = previewer,
   actions = {
     ['default'] = p_do(function(p)
       local dir = p.dir
@@ -90,16 +101,18 @@ M.opts = {
     end),
     ['ctrl-r'] = p_do(function(p)
       if p._ and p._.loaded then
-        u.warn('Reload %s', p.name)
+        u.log('Reload %s', p.name)
         require('lazy.core.loader').reload(p)
       else
-        u.warn('Load %s', p.name)
-        require('lazy.core.loader').load(p, { cmd = 'Lazy load' })
+        u.log('Load %s', p.name)
+        require('lazy.core.loader').load(p, { cmd = 'Load by flo picker' })
       end
     end),
-    -- TODO: support `reload = true`
-    ['ctrl-g'] = function() a.toggle_mode(f.lazy, all_repo, M.opts) end,
-    ['ctrl-x'] = function() a.toggle_mode(f.lazy, all_repo, M.opts, 'ctrl-x') end,
+    ['ctrl-g'] = function() return a.toggle_mode(f.lazy, all_repo, M.opts) end,
+    -- ['ctrl-x'] = function() return a.toggle_mode(f.lazy, all_repo, M.opts, 'ctrl-x') end,
+
+    -- to support `reload = true`, we need hook a cond into `fzf_cb(encode...`
+    -- ['ctrl-x'] = { fn = function() is_repo = not is_repo end, reload = true },
   },
 }
 

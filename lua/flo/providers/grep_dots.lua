@@ -1,9 +1,9 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-local cfg = require('fzf-lua-overlay.config').opts
+local cfg = require('flo').getcfg()
 
-M.name = 'live_grep_native'
+M.api_name = 'live_grep_native'
 
 -- 'live_grep_native'
 M.opts = {

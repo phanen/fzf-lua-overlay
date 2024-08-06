@@ -22,7 +22,6 @@ M.opts = {
           break
         end
       end
-      vim.print(path)
 
       local license = selected[1]
       if not license then return u.log('no filetype') end
