@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*      For Neovim >= 0.8.0     Last change: 2024 August 05
+*fzf-lua-overlay.txt*      For Neovim >= 0.8.0     Last change: 2024 August 11
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -39,7 +39,7 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
 >lua
     local fl = setmetatable({}, {
       __index = function(_, k)
-        return ([[<cmd>lua require('fzf-lua-overlay').%s()<cr>]]):format(k)
+        return ([[<cmd>lua require('flo').%s()<cr>]]):format(k)
       end,
     })
     
@@ -47,8 +47,9 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
       {
     
         'phanen/fzf-lua-overlay',
+        main = 'flo',
         cond = not vim.g.vscode,
-        init = function() require('fzf-lua-overlay').init() end,
+        init = function() require('flo').init() end,
         -- stylua: ignore
         keys = {
           -- try new pickers
