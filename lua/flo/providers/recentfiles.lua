@@ -48,15 +48,23 @@ M._.lru_access = lru_access
 M._.lru_foreach = lru_foreach
 
 M.api_name = 'fzf_exec'
+M.opt_name = 'oldfiles'
+
+local fzfconfig = require 'fzf-lua.config'
 
 M.opts = {
   prompt = 'recent> ',
-  previewer = 'builtin',
-  actions = vim.tbl_get(require('fzf-lua.config').setup_opts, 'actions', 'files'),
+  -- note again, these opts are for fzf_exec, but not oldifles
+  -- so we need merge in our fzf_exec_arg
+  -- comment out to override opts from `oldfiles`
+  -- previewer = 'builtin',
+  -- path_shorten = 3,
 }
 
 M.fzf_exec_arg = function(fzf_cb)
-  local opts = { file_icons = true, color_icons = true }
+  -- since we mimic oldfiles from fzf_exec and we never save our config
+  -- we need merge it to get final opts again
+  local opts = fzfconfig.normalize_opts(M.opts, 'oldfiles')
   local function add_entry(x, co)
     x = require('fzf-lua.make_entry').file(x, opts)
     if not x then return end

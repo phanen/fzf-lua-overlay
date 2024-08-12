@@ -36,11 +36,13 @@ end
 
 ---@class FzfLuaOverlaySpec
 ---@field api_name string builtin picker of fzf-lua
+---@field opt_name string inhert fzflua.config.setup_opts[opt_name]
 ---@field opts table
 ---@field fzf_exec_arg? function|string only used for fzf_exec
 
 ---@type table<string, FzfLuaOverlaySpec>
 local overlay = setmetatable({
+  -- FIXME: no override hook in this
   todo_comment = { api_name = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
 }, {
   __index = function(t, k)
@@ -81,12 +83,19 @@ local overlay = setmetatable({
 
 ---@return table
 local opts_fn = function(k)
-  -- if k == 'resume' then return {} end
+  -- resume the query
+  if k == 'resume' then return {} end
   return { query = table.concat(require('flo.util').getregion()) }
 end
 
 -- apply order:
 --   overlay[k]: in-table -> providers -> fzf-lua
+--   config: inhert -> overlay[k].opts -> opts_fn -> api_opts
+
+local fzf = require('fzf-lua')
+-- TODO: not sure why this don't work
+local fzfopts = fzf.config.setup_opts
+-- local fzfopts = require('fzf-lua.config').setup_opts
 
 return setmetatable(M, {
   __index = function(_, k)
@@ -94,8 +103,13 @@ return setmetatable(M, {
       ---@type FzfLuaOverlaySpec
       local o = overlay[k]
       local opts = vim.tbl_deep_extend('force', o.opts, opts_fn(k), api_opts or {})
-      local fzf_api = require('fzf-lua')[o.api_name]
-      -- if o.fzf_exec_arg then
+
+      fzfopts = require('fzf-lua.config').setup_opts
+      if o.opt_name then -- inhert configs from fzf-lua
+        opts = vim.tbl_deep_extend('keep', opts, vim.tbl_get(fzfopts, o.opt_name) or {})
+      end
+
+      local fzf_api = fzf[o.api_name]
       if o.fzf_exec_arg then
         return fzf_api(o.fzf_exec_arg, opts)
       else
