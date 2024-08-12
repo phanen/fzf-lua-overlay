@@ -3,8 +3,20 @@ local M = {}
 
 M.api_name = 'fzf_exec'
 
+-- TODO: refactor this
+local encode = require('flo.providers.scriptnames').encode
+
 M.opts = {
   preview = 'ls --color {1}',
+  -- previewer = 'builtin',
+  -- previewer = 'bat',
+  previewer = {
+    cmd = 'exa --color=always -l',
+    -- args = '-n',
+    _ctor = require('fzf-lua.previewer').fzf.cmd,
+  },
+
+  path_shorten = 'set-to-tirgger-glob-expansion',
   actions = {
     ['default'] = function(selected)
       local path = selected[1]
@@ -26,7 +38,7 @@ M.fzf_exec_arg = function(fzf_cb)
     local co = coroutine.running()
     local rtps = vim.api.nvim_list_runtime_paths()
     for _, rtp in ipairs(rtps) do
-      fzf_cb(rtp, function() coroutine.resume(co) end)
+      fzf_cb(encode(rtp), function() coroutine.resume(co) end)
       coroutine.yield()
     end
     fzf_cb()
