@@ -81,7 +81,6 @@ end
 local previewer = require('flo.previewers.lazy').builtin
 
 M.opts = {
-  prompt = 'lazy> ',
   previewer = previewer,
   actions = {
     ['default'] = p_do(function(p)

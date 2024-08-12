@@ -4,7 +4,6 @@ local M = {}
 M.api_name = 'fzf_exec'
 
 M.opts = {
-  prompt = 'zoxide> ',
   preview = ('%s -lh --color=always {2}'):format(vim.fn.executable('eza') == 1 and 'eza' or 'ls'),
   -- preview = 'onefetch {2}',
   -- preview = 'tokei {2}',

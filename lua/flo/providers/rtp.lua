@@ -4,7 +4,6 @@ local M = {}
 M.api_name = 'fzf_exec'
 
 M.opts = {
-  prompt = 'rtp> ',
   preview = 'ls --color {1}',
   actions = {
     ['default'] = function(selected)

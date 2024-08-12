@@ -39,7 +39,6 @@ function gitignore_previewer:parse_entry(entry_str)
 end
 
 M.opts = {
-  prompt = 'gitignore> ',
   previewer = gitignore_previewer,
   actions = {
     ['default'] = function(selected)

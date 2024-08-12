@@ -8,7 +8,6 @@ local M = {}
 M.api_name = 'fzf_exec'
 
 M.opts = {
-  prompt = 'scriptnames> ',
   previewer = 'builtin',
   actions = file_actions,
 }

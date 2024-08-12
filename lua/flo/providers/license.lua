@@ -37,7 +37,6 @@ function license_previewer:parse_entry(entry_str)
 end
 
 M.opts = {
-  prompt = 'license> ',
   previewer = license_previewer,
   actions = {
     ['default'] = function(selected)
