@@ -4,12 +4,25 @@ local M = {}
 M.api_name = 'fzf_exec'
 M.opt_name = 'file'
 
+local fp = require 'fzf-lua.path'
+local entry_to_file = function(entry)
+  local path = fp.entry_to_file(entry).path
+  path = vim.fn.glob(path)
+  return path
+end
+
 M.opts = {
   previewer = 'builtin',
   -- HACK: set this to non-nil to trigger glob expansion in `entry_to_file`
   -- and then we use environment variable
   -- https://github.com/ibhagwan/fzf-lua/blob/8f9c3a2e308755c25630087f3c5d35786803cfd0/lua/fzf-lua/path.lua#L486-L486
   path_shorten = 'set-to-tirgger-glob-expansion',
+
+  actions = {
+    ['default'] = function(selected, _)
+      vim.iter(selected):each(function(sel) vim.cmd.e(entry_to_file(sel)) end)
+    end,
+  },
 }
 
 local xdg_config = vim.env.XDG_CONFIG_HOME
@@ -47,12 +60,30 @@ local encode = function(name)
   return name
 end
 
+-- export here to be used in rtp provider
 M.encode = encode
 
+local devicons = require 'fzf-lua.devicons'
+local fzfconfig = require 'fzf-lua.config'
+local fzfutil = require 'fzf-lua.utils'
+-- this also loads devicons...
+-- local opts = fzfconfig.normalize_opts(M.opts, 'oldfiles')
+
 M.fzf_exec_arg = function(fzf_cb)
+  -- opts.path_shorten = M.opts
+  devicons.load()
+
   local function add_entry(x, co)
     -- x = require('fzf-lua.make_entry').file(x, opts)
-    x = encode(x)
+    local ret = {}
+    local icon, hl = devicons.get_devicon(x)
+    if hl then icon = fzfutil.ansi_from_rgb(hl, icon) end
+    ret[#ret + 1] = icon
+    ret[#ret + 1] = fzfutil.nbsp
+    ret[#ret + 1] = encode(x)
+    -- x = encode(x)
+    x = table.concat(ret)
+
     if not x then return end
     fzf_cb(x, function(err)
       coroutine.resume(co)
