@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.0.0...v2.1.0) (2024-08-14)
+
+
+### Features
+
+* colorful rtp (wip: previewer) ([df66d72](https://github.com/phanen/fzf-lua-overlay/commit/df66d723eb47ff441131eaccdcabb960955677c2))
+* **scriptnames:** add file icons ([d72fb8d](https://github.com/phanen/fzf-lua-overlay/commit/d72fb8d03faf75832606cfa60d1f4a46828c3db9))
+* use `opt_name` to inhert config from fzf-lua ([64fb0ab](https://github.com/phanen/fzf-lua-overlay/commit/64fb0abc780434e42868e9c45a1d4f3ab30bb061))
+
+
+### Bug Fixes
+
+* handle icons in oldfiles ([64fb0ab](https://github.com/phanen/fzf-lua-overlay/commit/64fb0abc780434e42868e9c45a1d4f3ab30bb061))
+* remove nonsense (override by top `prompt = false`) ([94f8f95](https://github.com/phanen/fzf-lua-overlay/commit/94f8f952aff42a7e4988b679cf423b715430a0dd))
+
 ## [2.0.0](https://github.com/phanen/fzf-lua-overlay/compare/v1.11.0...v2.0.0) (2024-08-01)
 
 
