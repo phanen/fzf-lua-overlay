@@ -11,6 +11,7 @@ function! s:fzf_lua_overlay_complete(arg, line, pos) abort
         \"lazy",
         \"license",
         \"recentfiles",
+        \"undo",
         \'rtp',
         \"scriptnames",
         \"todo_comment",
