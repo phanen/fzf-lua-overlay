@@ -3,9 +3,9 @@ local M = {}
 M.api_name = 'fzf_exec'
 
 -- tbh lazy load is not necessary now, just use alias here
-local u = require('flo.util')
-local a = require('flo.actions')
-local f = require('flo')
+local floutil = require('flo.util')
+local floacts = require('flo.actions')
+local flo = require('flo')
 
 ---define how to show the plugins
 ---@param filter fun(p):boolean
@@ -18,7 +18,7 @@ local actions_builder = function(filter, encode)
     coroutine.wrap(function()
       local co = coroutine.running()
       -- stylua: ignore
-      vim.iter(u.get_lazy_plugins())
+      vim.iter(floutil.get_lazy_plugins())
         :filter(filter)
         :each(function(_, p)
           fzf_cb(encode(p), function() coroutine.resume(co) end)
@@ -71,7 +71,7 @@ local p_do = function(cb, limit)
     vim.iter(selected):take(limit):each(function(sel)
       local bs_parts = vim.split(sel, '/')
       local name = bs_parts[#bs_parts]
-      local plugin = u.get_lazy_plugins(name)
+      local plugin = floutil.get_lazy_plugins(name)
       cb(plugin)
     end)
   end
@@ -85,7 +85,7 @@ M.opts = {
   actions = {
     ['default'] = p_do(function(p)
       local dir = p.dir
-      if dir and vim.uv.fs_stat(dir) then u.chdir(dir) end
+      if dir and vim.uv.fs_stat(dir) then floutil.chdir(dir) end
     end),
     ['ctrl-o'] = p_do(function(p) -- search cleaned plugins
       local url = p.url or ('https://github.com/search?q=%s'):format(p.name)
@@ -100,14 +100,14 @@ M.opts = {
     end),
     ['ctrl-r'] = p_do(function(p)
       if p._ and p._.loaded then
-        u.log('Reload %s', p.name)
+        floutil.log('Reload %s', p.name)
         require('lazy.core.loader').reload(p)
       else
-        u.log('Load %s', p.name)
+        floutil.log('Load %s', p.name)
         require('lazy.core.loader').load(p, { cmd = 'Load by flo picker' })
       end
     end),
-    ['ctrl-g'] = function() return a.toggle_mode(f.lazy, all_repo, M.opts) end,
+    ['ctrl-g'] = function() return floacts.toggle_mode(flo.lazy, all_repo, M.opts) end,
     -- ['ctrl-x'] = function() return a.toggle_mode(f.lazy, all_repo, M.opts, 'ctrl-x') end,
 
     -- to support `reload = true`, we need hook a cond into `fzf_cb(encode...`
