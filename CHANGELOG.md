@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/phanen/fzf-lua-overlay/compare/v2.1.0...v2.1.1) (2024-09-01)
+
+
+### Bug Fixes
+
+* lazy loading ([71849a9](https://github.com/phanen/fzf-lua-overlay/commit/71849a99a8933991c616b3eae6f058665280a62e))
+
 ## [2.1.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.0.0...v2.1.0) (2024-08-14)
 
 
