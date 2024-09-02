@@ -35,80 +35,66 @@ M.init = function()
 end
 
 ---@class FzfLuaOverlaySpec
----@field api_name string builtin picker of fzf-lua
----@field opt_name string inhert fzflua.config.setup_opts[opt_name]
+---@field api_name string use which picker
+---@field opt_name string inherit which opts
 ---@field opts table
 ---@field fzf_exec_arg? function|string only used for fzf_exec
 
----@type table<string, FzfLuaOverlaySpec>
-local overlay = setmetatable({
-}, {
-  __index = function(t, k)
-    local ok, v = pcall(require, 'flo.providers.' .. k)
-
-    if ok then
-      -- use overlay providers, also eval some common opts
-      local snake_to_upper = function(name)
-        local parts = vim.tbl_map(
-          function(part) return part:sub(1, 1):upper() .. part:sub(2) end,
-          vim.split(name, '_')
-        )
-        return table.concat(parts, ' ')
-      end
-      v.opts = vim.tbl_deep_extend('force', v.opts, {
-        prompt = false,
-        winopts = {
-          -- override default-title profile (#1)
-          title = ' ' .. snake_to_upper(k) .. ' ',
-          title_pos = 'center',
-        },
-      })
-    else
-      -- fallback to fzf-lua or crash if api not found
-      local stacktrace = v
-      assert(
-        require('fzf-lua')[k],
-        ('no such overlay: `%s`, or it just crash:\n%s'):format(k, stacktrace)
-      )
-      -- passthrough require('fzf-lua')[api_name]
-      v = { api_name = k, opts = {} }
-    end
-
-    rawset(t, k, v)
-    return v
-  end,
-})
-
----@return table
-local opts_fn = function(k)
-  -- resume the query
-  if k == 'resume' then return {} end
-  return { query = table.concat(require('flo.util').getregion()) }
+---@generic T, K
+---@param func fun(arg1:T):K
+---@return table<T, K>
+local once = function(func)
+  return setmetatable({}, {
+    __index = function(m, k)
+      local v = func(k)
+      rawset(m, k, v)
+      return v
+    end,
+  })
 end
 
--- apply order:
---   overlay[k]: in-table -> providers -> fzf-lua
---   config: inhert -> overlay[k].opts -> opts_fn -> api_opts
+local specs = once(function(k)
+  local ok, or_err = pcall(require, 'flo.providers.' .. k)
+  if not ok then
+    if not or_err:match('^module .* not found:') then error(or_err) end
+    assert(require('fzf-lua')[k], ('No such API: %s'):format(k))
+    or_err = { api_name = k, opts = {} }
+  end
+  or_err.opts = vim.tbl_deep_extend('force', or_err.opts, {
+    prompt = false,
+    winopts = { -- override default-title profile (#1)
+      title = '[' .. k .. ']',
+      title_pos = 'center',
+    },
+  })
+  return or_err ---@type FzfLuaOverlaySpec
+end)
 
-return setmetatable(M, {
-  __index = function(_, k)
-    return function(api_opts)
-      ---@type FzfLuaOverlaySpec
-      local o = overlay[k]
-      local opts = vim.tbl_deep_extend('force', o.opts, opts_fn(k), api_opts or {})
+---@return fun(opts: table)
+local apis = once(function(k)
+  return function(call_opts)
+    local spec = specs[k] ---@type FzfLuaOverlaySpec
+    local opts = {}
 
-      -- setup_opts require fzf-lua.setup (so we cannot get it outside function)
-      local fzfopts = require('fzf-lua.config').setup_opts
-      if o.opt_name then -- inhert configs from fzf-lua
-        opts = vim.tbl_deep_extend('keep', opts, vim.tbl_get(fzfopts, o.opt_name) or {})
-      end
-
-      local fzf_api = require('fzf-lua')[o.api_name]
-      if o.fzf_exec_arg then
-        return fzf_api(o.fzf_exec_arg, opts)
-      else
-        return fzf_api(opts)
-      end
+    if spec.opt_name then -- also handle stuffs like devicons/globbing transform...
+      opts = require('fzf-lua.config').normalize_opts({}, spec.opt_name)
     end
-  end,
-})
+
+    opts = vim.tbl_deep_extend(
+      'force',
+      opts,
+      spec.opts,
+      { query = table.concat(require('flo.util').getregion()) },
+      call_opts or {}
+    )
+
+    local fzf_api = require('fzf-lua')[spec.api_name]
+    if spec.fzf_exec_arg then
+      return fzf_api(spec.fzf_exec_arg, opts)
+    else
+      return fzf_api(opts)
+    end
+  end
+end)
+
+return setmetatable(M, { __index = apis })

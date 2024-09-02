@@ -50,20 +50,15 @@ M._.lru_foreach = lru_foreach
 M.api_name = 'fzf_exec'
 M.opt_name = 'oldfiles'
 
+-- TODO:
 M.opts = {
-  -- note again, these opts are for fzf_exec, but not oldifles
-  -- so we need merge in our fzf_exec_arg
-  -- comment out to override opts from `oldfiles`
-  -- previewer = 'builtin',
   -- path_shorten = 3,
 }
 
--- since we mimic oldfiles from fzf_exec and we never save our config
--- we need merge it to get final opts again
-local fzfconfig = require 'fzf-lua.config'
-local opts = fzfconfig.normalize_opts(M.opts, 'oldfiles')
-
+-- FIXME: twice `normalize_opts` in current overlay structure...
 M.fzf_exec_arg = function(fzf_cb)
+  local fzfconfig = require 'fzf-lua.config'
+  local opts = fzfconfig.normalize_opts(M.opts, 'oldfiles')
   local function add_entry(x, co)
     x = require('fzf-lua.make_entry').file(x, opts)
     if not x then return end

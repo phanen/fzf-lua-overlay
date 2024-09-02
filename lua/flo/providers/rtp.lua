@@ -7,16 +7,13 @@ M.api_name = 'fzf_exec'
 local encode = require('flo.providers.scriptnames').encode
 
 M.opts = {
-  preview = 'ls --color {1}',
-  -- previewer = 'builtin',
-  -- previewer = 'bat',
   previewer = {
     cmd = 'exa --color=always -l',
     -- args = '-n',
     _ctor = require('fzf-lua.previewer').fzf.cmd,
   },
 
-  path_shorten = 'set-to-tirgger-glob-expansion',
+  path_shorten = 'set-to-trigger-glob-expansion',
   actions = {
     ['default'] = function(selected)
       local path = selected[1]

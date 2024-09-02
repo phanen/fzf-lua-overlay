@@ -157,4 +157,15 @@ M.gh_cache_json = function(route, root, opts)
   return ok, str, ok and tbl or nil
 end
 
+-- snake to camel
+---@param name string
+---@return string
+M.snake_to_camel = function(name)
+  local names = vim.split(name, '_')
+  local parts = vim.tbl_map(function(part) return part:sub(1, 1):upper() .. part:sub(2) end, names)
+  return table.concat(parts, '')
+end
+
+local ac = require('fzf-lua.utils').ansi_codes
+
 return M
