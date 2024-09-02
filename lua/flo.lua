@@ -42,8 +42,6 @@ end
 
 ---@type table<string, FzfLuaOverlaySpec>
 local overlay = setmetatable({
-  -- FIXME: no override hook in this
-  todo_comment = { api_name = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
 }, {
   __index = function(t, k)
     local ok, v = pcall(require, 'flo.providers.' .. k)
