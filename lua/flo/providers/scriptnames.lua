@@ -1,8 +1,8 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'fzf_exec'
-M.opt_name = 'files' -- it seems also enable globbing expand in `normalize_opts`
+M.fn = 'fzf_exec'
+M.inherit = 'files' -- it seems also enable globbing expand in `normalize_opts`
 
 local fp = require 'fzf-lua.path'
 local entry_to_file = function(entry)

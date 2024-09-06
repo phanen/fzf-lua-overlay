@@ -35,8 +35,8 @@ M.init = function()
 end
 
 ---@class FzfLuaOverlaySpec
----@field api_name string use which picker
----@field opt_name string inherit which opts
+---@field fn string|function api's name or custom function
+---@field inherit? string inherit which opts
 ---@field opts table
 ---@field fzf_exec_arg? function|string only used for fzf_exec
 
@@ -58,7 +58,7 @@ local specs = once(function(k)
   if not ok then
     if not or_err:match('^module .* not found:') then error(or_err) end
     assert(require('fzf-lua')[k], ('No such API: %s'):format(k))
-    or_err = { api_name = k, opts = {} }
+    or_err = { fn = k, opts = {} } ---@type FzfLuaOverlaySpec
   end
   or_err.opts = vim.tbl_deep_extend('force', or_err.opts, {
     prompt = false,
@@ -67,33 +67,27 @@ local specs = once(function(k)
       title_pos = 'center',
     },
   })
-  return or_err ---@type FzfLuaOverlaySpec
+  return or_err
 end)
 
 ---@return fun(opts: table)
 local apis = once(function(k)
   return function(call_opts)
     local spec = specs[k] ---@type FzfLuaOverlaySpec
-    local opts = {}
 
-    if spec.opt_name then -- also handle stuffs like devicons/globbing transform...
-      opts = require('fzf-lua.config').normalize_opts({}, spec.opt_name)
-    end
-
+    -- also handle stuffs like devicons/globbing transform...
+    local opts = spec.inherit and require('fzf-lua.config').normalize_opts({}, spec.inherit) or {}
     opts = vim.tbl_deep_extend(
       'force',
       opts,
-      spec.opts,
+      spec.opts or {},
       { query = table.concat(require('flo.util').getregion()) },
       call_opts or {}
     )
 
-    local fzf_api = require('fzf-lua')[spec.api_name]
-    if spec.fzf_exec_arg then
-      return fzf_api(spec.fzf_exec_arg, opts)
-    else
-      return fzf_api(opts)
-    end
+    local fzf = type(spec.fn) == 'function' and spec.fn or require('fzf-lua')[spec.fn]
+    if spec.fzf_exec_arg then return fzf(spec.fzf_exec_arg, opts) end
+    return fzf(opts)
   end
 end)
 

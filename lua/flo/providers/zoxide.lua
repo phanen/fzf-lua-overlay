@@ -1,7 +1,7 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'fzf_exec'
+M.fn = 'fzf_exec'
 
 M.opts = {
   preview = ('%s -lh --color=always {2}'):format(vim.fn.executable('eza') == 1 and 'eza' or 'ls'),

@@ -1,6 +1,7 @@
+---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'grep'
+M.fn = 'grep'
 
 M.opts = {
   -- previewer = false,

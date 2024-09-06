@@ -3,7 +3,7 @@ local cfg = require('flo').getcfg()
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'live_grep_native'
+M.fn = 'live_grep_native'
 
 M.opts = {
   cwd = cfg.note_dir,

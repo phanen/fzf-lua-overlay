@@ -6,7 +6,7 @@ local builtin_previewer = require('fzf-lua.previewer.builtin')
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'fzf_exec'
+M.fn = 'fzf_exec'
 
 local ft_to_path = function(filetype) return cache_dir .. '/gitignore/templates/' .. filetype end
 

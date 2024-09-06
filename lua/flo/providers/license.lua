@@ -6,7 +6,7 @@ local builtin_previewer = require('fzf-lua.previewer.builtin')
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'fzf_exec'
+M.fn = 'fzf_exec'
 
 -- trim the ext, since gh_cache_json will cache in: (retval .. '.json')
 local licen_to_path = function(license) return vim.fs.joinpath(cache_dir, 'licenses', license) end

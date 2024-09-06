@@ -5,7 +5,7 @@ local notes_history = cfg.cache_dir .. '/notes_history'
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'files'
+M.fn = 'files'
 
 M.opts = {
   cwd = cfg.note_dir,

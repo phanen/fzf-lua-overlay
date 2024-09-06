@@ -3,7 +3,7 @@ local M = {}
 
 local cfg = require('flo').getcfg()
 
-M.api_name = 'live_grep_native'
+M.fn = 'live_grep_native'
 
 -- 'live_grep_native'
 M.opts = {

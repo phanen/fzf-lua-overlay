@@ -1,6 +1,6 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
-M.api_name = 'fzf_exec'
+M.fn = 'fzf_exec'
 
 -- tbh lazy load is not necessary now, just use alias here
 local floutil = require('flo.util')

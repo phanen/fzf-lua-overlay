@@ -1,7 +1,7 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.api_name = 'fzf_exec'
+M.fn = 'fzf_exec'
 
 -- TODO: refactor this
 local encode = require('flo.providers.scriptnames').encode
