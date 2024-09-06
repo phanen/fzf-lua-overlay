@@ -25,6 +25,8 @@ M.init = function()
   vim.api.nvim_create_autocmd('BufDelete', {
     group = group,
     callback = function(args)
+      package.loaded['flo.state'] = { session_files = {} }
+
       -- workaround for open no name buffer on enter...
       if vim.api.nvim_buf_get_name(args.buf) == '' then return end
       local filename = args.match
