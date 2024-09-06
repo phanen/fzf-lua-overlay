@@ -1,51 +1,10 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
--- simple lru (recent closed filename)
-local session_files = require('flo.state').session_files
-local head = { n = nil }
-local tail = { p = head }
-head.n = tail
+local sess_files = package.loaded['flo.state'].session_files
 
--- used in init setup
-local lru_access = function(k)
-  local ptr = session_files[k]
-  if ptr then
-    ptr.n.p = ptr.p
-    ptr.p.n = ptr.n
-    ptr.n = head.n
-    ptr.p = head
-    head.n.p = ptr
-    head.n = ptr
-  else
-    ptr = { n = head.n, p = head, k = k }
-    head.n.p = ptr
-    head.n = ptr
-    session_files[k] = ptr
-  end
-end
-
-local lru_foreach = function(cb)
-  local p = head.n
-  while p and p ~= tail do
-    if p.k then
-      cb(p.k)
-      p = p.n
-    end
-  end
-end
-
--- local lru_peek = function()
---   lru_foreach(function(file)
---     print(file)
---   end)
--- end
-
--- export for init setup or whatever
 ---@diagnostic disable-next-line: inject-field
-M._ = {}
-M._.lru_access = lru_access
-M._.lru_foreach = lru_foreach
+M._lru = require('flo.util').create_lru(sess_files)
 
 M.inherit = 'oldfiles'
 
@@ -71,13 +30,13 @@ M.fn = function(opts)
         bufmap[buf.name] = true
       end
 
-      lru_foreach(function(file)
+      M._lru.foreach(function(file)
         local fs_stat = not utils.file_is_fifo(file) and utils.file_is_readable(file)
         if fs_stat and not bufmap[file] then add_entry(file, co) end
       end)
       for _, file in ipairs(vim.v.oldfiles) do
         local fs_stat = not utils.file_is_fifo(file) and utils.file_is_readable(file)
-        if fs_stat and not session_files[file] and not bufmap[file] then add_entry(file, co) end
+        if fs_stat and not sess_files[file] and not bufmap[file] then add_entry(file, co) end
       end
       fzf_cb()
     end)()

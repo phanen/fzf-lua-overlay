@@ -166,4 +166,42 @@ M.snake_to_camel = function(name)
   return table.concat(parts, '')
 end
 
+M.create_lru = function(storage)
+  local head = { n = nil }
+  local tail = { p = head }
+  head.n = tail
+
+  local access = function(k)
+    local ptr = storage[k]
+    if ptr then
+      ptr.n.p = ptr.p
+      ptr.p.n = ptr.n
+      ptr.n = head.n
+      ptr.p = head
+      head.n.p = ptr
+      head.n = ptr
+    else
+      ptr = { n = head.n, p = head, k = k }
+      head.n.p = ptr
+      head.n = ptr
+      storage[k] = ptr
+    end
+  end
+
+  local foreach = function(cb)
+    local p = head.n
+    while p and p ~= tail do
+      if p.k then
+        cb(p.k)
+        p = p.n
+      end
+    end
+  end
+
+  return {
+    access = access,
+    foreach = foreach,
+  }
+end
+
 return M
