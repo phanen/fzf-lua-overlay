@@ -166,6 +166,4 @@ M.snake_to_camel = function(name)
   return table.concat(parts, '')
 end
 
-local ac = require('fzf-lua.utils').ansi_codes
-
 return M
