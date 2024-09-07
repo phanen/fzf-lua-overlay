@@ -82,7 +82,7 @@ local apis = once(function(k)
       'force',
       opts,
       spec.opts or {},
-      { query = table.concat(require('flo.util').getregion()) },
+      k == 'resume' and {} or { query = table.concat(require('flo.util').getregion()) }, -- this enable resuming after `enter`
       call_opts or {}
     )
 
