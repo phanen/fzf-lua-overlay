@@ -9,7 +9,7 @@ M.getregion = function(mode)
   return vim.fn.getregion(vim.fn.getpos '.', vim.fn.getpos 'v', { type = mode })
 end
 
-M.chdir = (function()
+M.zoxide_chdir = (function()
   if vim.fn.executable('zoxide') == 1 then
     return function(path)
       vim.system { 'zoxide', 'add', path }

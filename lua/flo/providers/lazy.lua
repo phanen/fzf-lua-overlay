@@ -85,7 +85,7 @@ M.opts = {
   actions = {
     ['default'] = p_do(function(p)
       local dir = p.dir
-      if dir and vim.uv.fs_stat(dir) then floutil.chdir(dir) end
+      if dir and vim.uv.fs_stat(dir) then floutil.zoxide_chdir(dir) end
     end),
     ['ctrl-o'] = p_do(function(p) -- search cleaned plugins
       local url = p.url or ('https://github.com/search?q=%s'):format(p.name)

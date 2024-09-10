@@ -10,7 +10,7 @@ M.opts = {
   actions = {
     ['default'] = function(selected)
       local path = selected[1]:match '/.+'
-      require('flo.util').chdir(path)
+      require('flo.util').zoxide_chdir(path)
     end,
     ['ctrl-l'] = function(selected)
       local path = selected[1]:match '/.+'
