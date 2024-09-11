@@ -111,8 +111,10 @@ function lazy_builtin:new(o, opts, fzf_win)
 end
 
 function lazy_builtin:populate_preview_buf(entry_str)
-  -- sadly, limited by parent previewer is not async
-  -- vim.schedule(function()
+  if entry_str == '' then
+    self:clear_preview_buf(true)
+    return
+  end
   local plugin = parse_entry(self, entry_str)
   local t, data = parse_plugin_type(self, plugin)
 
