@@ -1,7 +1,6 @@
 local builtin_previewer = require('fzf-lua.previewer.builtin')
 local fzf_previewer = require('fzf-lua.previewer.fzf')
 local libuv = require('fzf-lua.libuv')
-local fzfutil = require('fzf-lua.utils')
 local floutil = require('flo.util')
 
 local github_raw_url = function(url, filepath)
@@ -154,6 +153,8 @@ function lazy_builtin:populate_preview_buf(entry_str)
   elseif t == p_type.LOCAL then
     filetype = 'lua'
   end
+
+  local fzfutil = require('fzf-lua.utils')
 
   local output, _ = fzfutil.io_systemlist(cmd)
   local tmpbuf = self:get_tmp_buffer()

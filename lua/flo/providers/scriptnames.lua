@@ -35,9 +35,8 @@ vim.env.VIMFILE = vimfile
 local lazy = package.loaded['lazy.core.config'].options.root
 vim.env.LAZY = lazy
 
-local ac = require('fzf-lua.utils').ansi_codes
-
 local encode = function(name)
+  local ac = require('fzf-lua.utils').ansi_codes
   if name:match('^' .. lazy) then
     name = name:gsub('^' .. lazy, ac.cyan('$LAZY'))
   elseif name:match('^' .. xdg_config) then

@@ -2,7 +2,9 @@ local M = {}
 
 local cfg = require('flo').getcfg()
 local floutil = require('flo.util')
-local fzf = require('fzf-lua')
+
+-- workaround to fix circile require
+local fzf = setmetatable({}, { __index = function(_, k) return require('fzf-lua')[k] end })
 
 local fn, api, fs, uv = vim.fn, vim.api, vim.fs, vim.uv
 

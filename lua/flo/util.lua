@@ -1,5 +1,3 @@
-local cache_dir = require('flo').getcfg().cache_dir
-
 local M = {}
 
 -- get visual selected with no side effect
@@ -139,7 +137,7 @@ end
 ---@param opts table? opts for vim.json.decode
 ---@return boolean?, string?, table?
 M.gh_cache_json = function(route, root, opts)
-  root = root or cache_dir
+  root = root or require('flo').getcfg().cache_dir
   opts = opts or {}
 
   local path = root .. '/' .. route .. '.json'
