@@ -154,16 +154,20 @@ function lazy_builtin:populate_preview_buf(entry_str)
     filetype = 'lua'
   end
 
-  local fzfutil = require('fzf-lua.utils')
-
-  local output, _ = fzfutil.io_systemlist(cmd)
-  local tmpbuf = self:get_tmp_buffer()
-  -- vim.api.nvim_buf_set_option(tmpbuf, 'modifiable', true)
-  vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, output)
-  if filetype then vim.bo[tmpbuf].filetype = filetype end
-  self:set_preview_buf(tmpbuf)
-  self.win:update_scrollbar()
-  -- end)
+  vim.system(
+    cmd,
+    {},
+    vim.schedule_wrap(function(obj)
+      -- local output, _ = fzfutil.io_systemlist(cmd)
+      local output = vim.split(obj.stdout, '\n')
+      local tmpbuf = self:get_tmp_buffer()
+      -- vim.api.nvim_buf_set_option(tmpbuf, 'modifiable', true)
+      vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, output)
+      if filetype then vim.bo[tmpbuf].filetype = filetype end
+      self:set_preview_buf(tmpbuf)
+      self.win:update_scrollbar()
+    end)
+  )
 end
 
 return {
