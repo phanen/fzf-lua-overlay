@@ -73,7 +73,7 @@ function lazy_fzf:cmdline(_)
       -- FIXME: 1. if subprocess false, still return 0; 2. 404 is even not a false (drop output if 404?)
       -- anyway, we just always run both commands here
       [p_type.UNINS_GH] = function()
-        return ('echo "Not Installed (fetch from github)!\n" && { curl -sL %s  | %s --language md; }; { curl -sL %s | %s --language md; }'):format(
+        return ('echo "> Not Installed (fetch from github)!\n" && { curl -sL %s  | %s --language md; }; { curl -sL %s | %s --language md; }'):format(
           github_raw_url(plugin.url, 'README.md'),
           self.bat_cmd,
           github_raw_url(plugin.url, 'readme.md'),
@@ -81,7 +81,7 @@ function lazy_fzf:cmdline(_)
         )
       end,
 
-      [p_type.UNINS_NO_GH] = 'echo "Not Installed (not github)"!',
+      [p_type.UNINS_NO_GH] = 'echo "> Not Installed (not github)"!',
 
       -- TODO: buffer_or_file/quickfix
       [p_type.INS_MD] = ('%s %s'):format(self.bat_cmd, data),
@@ -129,7 +129,7 @@ function lazy_builtin:populate_preview_buf(entry_str)
     -- FIXME: 1. if subprocess false, still return 0; 2. 404 is even not a false (drop output if 404?)
     -- anyway, we just always run both commands here
     [p_type.UNINS_GH] = function()
-      return ('echo "Not Installed (fetch from github)!\n" && curl -sL %s && curl -sL %s'):format(
+      return ('echo "> Not Installed (fetch from github)!\n" && curl -sL %s && curl -sL %s'):format(
         github_raw_url(plugin.url, 'README.md'),
         github_raw_url(plugin.url, 'readme.md')
         -- although there are other name (e.g. tpope use Readme.markdown)...
