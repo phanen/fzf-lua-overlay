@@ -32,7 +32,7 @@ M.write_file = function(path, str, flag, opts)
   opts = opts or { auto_create_dir = true }
   if opts.auto_create_dir then
     local dir = vim.fs.dirname(path)
-    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir) end
+    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir, 'p') end
   end
 
   local fd = io.open(path, flag or 'w')
@@ -95,7 +95,7 @@ M.curl = function(url) return vim.fn.system { 'curl', '-sL', url } end
 --- err -> true, str, tbl
 M.gh = function(route, opts)
   local str
-  if vim.fn.executable('gh') == 1 then
+  if vim.fn.executable('gh') == 0 then
     str = M.curl('https://api.github.com/' .. route)
   else
     str = vim.system { 'gh', 'api', route }:wait().stdout
@@ -139,13 +139,11 @@ end
 M.gh_cache_json = function(route, root, opts)
   root = root or require('flo').getcfg().cache_dir
   opts = opts or {}
-
   local path = root .. '/' .. route .. '.json'
-  print(route)
   if not vim.uv.fs_stat(path) then
     local ok, err_or_str, tbl = M.gh(route, opts)
     if ok then
-      local file_ok = M.write_file(path, err_or_str)
+      local file_ok = M.write_file(path, err_or_str, nil, { auto_create_dir = true })
       if not file_ok then return file_ok, 'write failed', tbl end
     end
     return ok, err_or_str, tbl

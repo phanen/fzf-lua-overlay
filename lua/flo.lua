@@ -13,7 +13,7 @@ M.setup = function(opts)
   options = vim.iter(options):fold({}, function(acc, k, v)
     local dir = vim.fs.normalize(v)
     acc[k] = dir
-    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir) end
+    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir, 'p') end
     return acc
   end)
 end
