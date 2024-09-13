@@ -71,6 +71,11 @@ local specs = once(function(k)
   return or_err
 end)
 
+local no_query = {
+  resume = true,
+  git_bcommits = true,
+}
+
 ---@return fun(opts: table)
 local apis = once(function(k)
   return function(call_opts)
@@ -82,7 +87,7 @@ local apis = once(function(k)
       'force',
       opts,
       spec.opts or {},
-      k == 'resume' and {} or { query = table.concat(require('flo.util').getregion()) }, -- this enable resuming after `enter`
+      no_query[k] and {} or { query = table.concat(require('flo.util').getregion()) }, -- this enable resuming after `enter`
       call_opts or {}
     )
 
