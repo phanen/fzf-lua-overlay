@@ -1,27 +1,72 @@
 local M = {}
 
+local notes_dir = '~/notes'
+
+-- dont care about side effect, just a global table i can use
 local options = {
-  dot_dir = '~',
-  note_dir = '~/notes',
-  todo_dir = '~/notes/todo/',
-  snip_dir = '~/notes/snip/',
   cache_dir = (vim.g.state_path or vim.fn.stdpath 'state') .. '/fzf-lua-overlay',
+  ---@type FzfLuaOverlaySpec[]
+  specs = {
+    find_notes = {
+      fn = 'files',
+      opts = {
+        cwd = notes_dir,
+        actions = {
+          ['ctrl-g'] = function()
+            local last_query = require('fzf-lua').get_last_query()
+            return require('flo').grep_notes({ query = last_query })
+          end,
+          ['ctrl-n'] = function(...) require('flo.actions').create_notes(...) end,
+          ['ctrl-x'] = function(...) require('flo.actions').file_delete(...) end,
+        },
+      },
+    },
+    grep_notes = {
+      fn = 'live_grep_glob',
+      opts = {
+        cwd = notes_dir,
+        actions = {
+          ['ctrl-g'] = function()
+            local last_query = require('fzf-lua').get_last_query()
+            return require('flo').find_notes { query = last_query }
+          end,
+        },
+      },
+    },
+    find_dots = {
+      fn = 'files',
+      opts = {
+        cwd = '~',
+        cmd = [[rg --color=never --files --hidden --follow -g "!.git" -L]], -- "-L" follows symlinks
+      },
+    },
+    grep_dots = {
+      fn = 'live_grep_glob',
+      opts = {
+        cwd = '~',
+        cmd = [[rg --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -L -e]],
+      },
+    },
+    todo_comment = {
+      fn = 'grep',
+      opts = {
+        search = 'TODO|HACK|PERF|NOTE|FIX',
+        no_esc = true,
+      },
+    },
+  },
 }
 
+package.loaded['flo.config'] = options
+
 M.setup = function(opts)
-  options = vim.tbl_deep_extend('force', options, opts or {})
-  options = vim.iter(options):fold({}, function(acc, k, v)
-    local dir = vim.fs.normalize(v)
-    acc[k] = dir
-    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir, 'p') end
-    return acc
-  end)
+  options = opts and vim.tbl_deep_extend('force', options, opts) or options
+  vim.fn.mkdir(vim.fn.expand(options.cache_dir), 'p')
+  package.loaded['flo.config'] = options
 end
 
-M.getcfg = function() return options end
-
 M.init = function()
-  local group = vim.api.nvim_create_augroup('FzfLuaOverlay', { clear = true })
+  local group = vim.api.nvim_create_augroup('FzfLuaOverlay', {})
   vim.api.nvim_create_autocmd('BufDelete', {
     group = group,
     callback = function(args)
@@ -30,7 +75,6 @@ M.init = function()
       if vim.api.nvim_buf_get_name(args.buf) == '' then return end
       local filename = args.match
       require('flo.providers.recentfiles')._lru.access(filename)
-      -- lru_peek()
     end,
   })
 end
@@ -55,20 +99,25 @@ local once = function(func)
 end
 
 local specs = once(function(k)
-  local ok, or_err = pcall(require, 'flo.providers.' .. k)
-  if not ok then
-    if not or_err:match('^module .* not found:') then error(or_err) end
-    assert(require('fzf-lua')[k], ('No such API: %s'):format(k))
-    or_err = { fn = k, opts = {} } ---@type FzfLuaOverlaySpec
+  local spec = options.specs[k]
+  if not spec then
+    local ok, or_err = pcall(require, 'flo.providers.' .. k)
+    if not ok then
+      if not or_err:match('^module .* not found:') then error(or_err) end
+      assert(require('fzf-lua')[k], ('No such API: %s'):format(k))
+      spec = { fn = k, opts = {} } ---@type FzfLuaOverlaySpec
+    else
+      spec = or_err
+    end
   end
-  or_err.opts = vim.tbl_deep_extend('force', or_err.opts, {
+  spec.opts = vim.tbl_deep_extend('force', spec.opts, {
     prompt = false,
     winopts = { -- override default-title profile (#1)
       title = '[' .. k .. ']',
       title_pos = 'center',
     },
   })
-  return or_err
+  return spec
 end)
 
 local no_query = {

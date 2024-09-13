@@ -1,6 +1,5 @@
 local builtin_previewer = require('fzf-lua.previewer.builtin')
 local fzf_previewer = require('fzf-lua.previewer.fzf')
-local libuv = require('fzf-lua.libuv')
 local floutil = require('flo.util')
 
 local github_raw_url = function(url, filepath)
@@ -147,25 +146,22 @@ function lazy_builtin:populate_preview_buf(entry_str)
 
   local cmdline = handlers[t]
   if not cmdline then return end
-  if type(cmdline) == 'function' then cmdline = cmdline() end
-  local cmd = { 'sh', '-c', cmdline }
-  local filetype
+  if vim.is_callable(cmdline) == 'function' then cmdline = cmdline() end
   if t == p_type.INS_MD or t == p_type.UNINS_GH then
-    filetype = 'markdown'
+    self.filetype = 'markdown'
   elseif t == p_type.LOCAL then
-    filetype = 'lua'
+    self.filetype = 'lua'
   end
 
   vim.system(
-    cmd,
-    {},
+    ---@cast cmdline string
+    { 'sh', '-c', cmdline },
+    ---@diagnostic disable-next-line: param-type-mismatch
     vim.schedule_wrap(function(obj)
-      -- local output, _ = fzfutil.io_systemlist(cmd)
       local output = vim.split(obj.stdout, '\n')
       local tmpbuf = self:get_tmp_buffer()
-      -- vim.api.nvim_buf_set_option(tmpbuf, 'modifiable', true)
       vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, output)
-      if filetype then vim.bo[tmpbuf].filetype = filetype end
+      if self.filetype then vim.bo[tmpbuf].filetype = self.filetype end
       self:set_preview_buf(tmpbuf)
       self.win:update_scrollbar()
     end)

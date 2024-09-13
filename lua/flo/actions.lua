@@ -1,7 +1,5 @@
+local options = require('flo.config')
 local M = {}
-
-local cfg = require('flo').getcfg()
-local floutil = require('flo.util')
 
 -- workaround to fix circile require
 local fzf = setmetatable({}, { __index = function(_, k) return require('fzf-lua')[k] end })
@@ -20,7 +18,10 @@ M.toggle_daily = function(_, opts)
 end
 
 -- create notes, snips or todos
-M.create_whatever = function(_, opts)
+M.create_notes = function(_, opts)
+  local todo_dir = '~/notes/todo'
+  local snip_dir = '~/notes/snip'
+
   local query = fzf.get_last_query()
   if not query or query == '' then query = os.date('%m-%d') .. '.md' end
   local parts = vim.split(query, ' ', { trimempty = true })
@@ -29,14 +30,13 @@ M.create_whatever = function(_, opts)
 
   -- multi fields, append todo
   if part_nr > 1 then
-    return (function()
-      local tag = parts[1]
-      local content = table.concat(parts, ' ', 2)
-      local path = fn.expand(fs.joinpath(cfg.todo_dir, tag)) .. '.md'
-      content = ('* %s\n'):format(content)
-      local ok = floutil.write_file(path, content, 'a')
-      if not ok then return vim.notify('fail to write to storage', vim.log.levels.WARN) end
-    end)()
+    local tag = parts[1]
+    local content = table.concat(parts, ' ', 2)
+    local path = fn.expand(fs.joinpath(todo_dir, tag)) .. '.md'
+    content = ('* %s\n'):format(content)
+    local ok = require('flo.util').write_file(path, content, 'a')
+    if not ok then return vim.notify('fail to write to storage', vim.log.levels.WARN) end
+    return
   end
 
   -- query as path
@@ -57,17 +57,16 @@ M.create_whatever = function(_, opts)
   if path_parts[2] == 'md' then
     path = fn.expand(fs.joinpath(opts.cwd, query))
   else
-    path = fn.expand(fs.joinpath(cfg.snip_dir, query))
+    path = fn.expand(fs.joinpath(snip_dir, query))
   end
 
   -- create, then open
   if not uv.fs_stat(path) then
     fn.mkdir(fn.fnamemodify(path, ':p:h'), 'p')
-    local ok = floutil.write_file(path)
+    local ok = require('flo.util').write_file(path)
     if not ok then return vim.notify(('fail to create %s'):format(path)) end
   end
-  vim.cmd.e(path)
-  vim.notify(('%s created'):format(query), vim.log.levels.INFO)
+  vim.cmd.edit(path)
 end
 
 -- open file (create if not exist)
@@ -76,10 +75,10 @@ M.file_create_open = function(_, opts)
   local path = fn.expand(('%s/%s'):format(opts.cwd or uv.cwd(), query))
   if not uv.fs_stat(path) then
     fn.mkdir(fn.fnamemodify(path, ':p:h'), 'p')
-    local ok = floutil.write_file(path)
+    local ok = require('flo.util').write_file(path)
     if not ok then return vim.notify(('fail to create %s'):format(path)) end
   end
-  vim.cmd.e(path)
+  vim.cmd.edit(path)
 end
 
 local delete_files = function(paths)

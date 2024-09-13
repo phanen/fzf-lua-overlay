@@ -1,74 +1,74 @@
-local cache_dir = require('flo').getcfg().cache_dir
 local floutil = require('flo.util')
-local fzfpath = require('fzf-lua.path')
 local builtin_previewer = require('fzf-lua.previewer.builtin')
+local api, _, _ = vim.api, vim.fn, vim.uv
 
 ---@type FzfLuaOverlaySpec
 local M = {}
 
 M.fn = 'fzf_exec'
 
-local ft_to_path = function(filetype) return cache_dir .. '/gitignore/templates/' .. filetype end
+local api_root = 'gitignore/templates'
+local previewer = builtin_previewer.buffer_or_file:extend()
 
--- cache gitignore source
-local gitignore_cache = function(filetype, path, fs_stat)
-  path = path or ft_to_path(filetype)
-  if fs_stat then return floutil.read_file(path) end
-
-  local ok, err, tbl = floutil.gh_cache_json('gitignore/templates/' .. filetype)
-  if not ok or not tbl then return floutil.log(err) end
-  local content = tbl.source
-  if not content then return floutil.log('unkown: no source field in json') end
-  floutil.write_file(path, content)
-  return content
+function previewer:new(o, opts, fzf_win)
+  previewer.super.new(self, o, opts, fzf_win)
+  self.api_root = api_root
+  self.filetype = 'gitignore'
+  self.json_key = 'source'
+  return self
 end
 
-local gitignore_previewer = builtin_previewer.buffer_or_file:extend()
-
-function gitignore_previewer:new(o, opts, fzf_win)
-  gitignore_previewer.super.new(self, o, opts, fzf_win)
-  return setmetatable(self, self)
-end
-
-function gitignore_previewer:parse_entry(entry_str)
-  local path = ft_to_path(entry_str)
-  local fs_stat = vim.uv.fs_stat(path)
-  if not fs_stat then gitignore_cache(entry_str, path, false) end
-  local entry = fzfpath.entry_to_file(path, self.opts)
-  return entry
+function previewer:populate_preview_buf(entry_str)
+  if entry_str == '' then
+    self:clear_preview_buf(true)
+    return
+  end
+  floutil.gh_cache(
+    self.api_root .. '/' .. entry_str,
+    vim.schedule_wrap(function(_, json)
+      local content = assert(json[self.json_key])
+      local lines = vim.split(content, '\n')
+      local tmpbuf = self:get_tmp_buffer()
+      api.nvim_buf_set_lines(tmpbuf, 0, -1, false, lines)
+      vim.bo[tmpbuf].filetype = self.filetype
+      self:set_preview_buf(tmpbuf)
+      self.win:update_scrollbar()
+    end)
+  )
 end
 
 M.opts = {
-  previewer = gitignore_previewer,
+  previewer = { _ctor = function() return previewer end },
   actions = {
     ['default'] = function(selected)
       local root = floutil.gitroot()
-      if not root then return floutil.log('not in a git repo') end
+      if not root then error('Not in a git repo') end
       local path = root .. '/.gitignore'
       if vim.uv.fs_stat(path) then
         local confirm = vim.fn.confirm('Override?', '&Yes\n&No')
         if confirm ~= 1 then return end
       end
       local filetype = assert(selected[1])
-      local content = assert(gitignore_cache(filetype))
-      floutil.write_file(path, content)
-      vim.cmd.e(path)
+      floutil.gh_cache(api_root .. '/' .. filetype, function(_, json)
+        local content = assert(json.source)
+        floutil.write_file(path, content)
+        vim.cmd.edit(path)
+      end)
     end,
   },
 }
 
 M.fzf_exec_arg = function(fzf_cb)
-  -- local ok, err, json = floutil.gh_cache('gitignore/templates', cache_dir .. '/gitignore.json')
-  local ok, err, json = floutil.gh_cache_json('gitignore/templates')
-  if not ok or not json then return floutil.log(err) end
-  coroutine.wrap(function()
-    local co = coroutine.running()
-    for _, item in ipairs(json) do
-      fzf_cb(item, function() coroutine.resume(co) end)
-      coroutine.yield()
-    end
-    fzf_cb()
-  end)()
+  floutil.gh_cache(api_root, function(_, json)
+    coroutine.wrap(function()
+      local co = coroutine.running()
+      vim.iter(json):each(function(item)
+        fzf_cb(item, function() coroutine.resume(co) end)
+        coroutine.yield()
+      end)
+      fzf_cb()
+    end)()
+  end)
 end
 
 return M

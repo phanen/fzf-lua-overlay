@@ -1,20 +1,23 @@
 local M = {}
 
+local api, fn, uv, fs = vim.api, vim.fn, vim.uv, vim.fs
+local iter = vim.iter
+
 -- get visual selected with no side effect
 M.getregion = function(mode)
-  mode = mode or vim.api.nvim_get_mode().mode
+  mode = mode or api.nvim_get_mode().mode
   if not vim.tbl_contains({ 'v', 'V', '\022' }, mode) then return {} end
-  return vim.fn.getregion(vim.fn.getpos '.', vim.fn.getpos 'v', { type = mode })
+  return fn.getregion(fn.getpos '.', fn.getpos 'v', { type = mode })
 end
 
 M.zoxide_chdir = (function()
-  if vim.fn.executable('zoxide') == 1 then
+  if fn.executable('zoxide') == 1 then
     return function(path)
       vim.system { 'zoxide', 'add', path }
-      vim.api.nvim_set_current_dir(path)
+      api.nvim_set_current_dir(path)
     end
   else
-    return vim.api.nvim_set_current_dir
+    return api.nvim_set_current_dir
   end
 end)()
 
@@ -26,18 +29,33 @@ M.read_file = function(path, flag)
   return content or ''
 end
 
--- path should normalized
+-- mkdir for file
+local fs_file_mkdir = function(path)
+  local parents = {}
+  iter(fs.parents(path)):all(function(dir)
+    local fs_stat = uv.fs_stat(dir)
+    if not fs_stat then
+      parents[#parents + 1] = dir
+      return true
+    end
+    return false
+  end)
+
+  iter(parents):rev():each(function(p) return uv.fs_mkdir(p, 493) end)
+end
+
+-- path should be normalized
 -- optionally create parent directory
-M.write_file = function(path, str, flag, opts)
+M.write_file = function(path, content, flag, opts)
   opts = opts or { auto_create_dir = true }
-  if opts.auto_create_dir then
-    local dir = vim.fs.dirname(path)
-    if not vim.uv.fs_stat(dir) then vim.fn.mkdir(dir, 'p') end
+
+  if not uv.fs_stat(path) and opts.auto_create_dir then --
+    fs_file_mkdir(path)
   end
 
   local fd = io.open(path, flag or 'w')
   if not fd then return false end
-  if str then fd:write(str) end
+  if content then fd:write(content) end
   fd:close()
   return true
 end
@@ -57,8 +75,8 @@ end
 
 ---@return string?
 M.gitroot = function(bufname)
-  if not bufname then bufname = vim.api.nvim_buf_get_name(0) end
-  local path = vim.fs.dirname(bufname)
+  if not bufname then bufname = api.nvim_buf_get_name(0) end
+  local path = fs.dirname(bufname)
   local obj = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait()
   if obj.code == 0 then return vim.trim(obj.stdout) end
 end
@@ -87,70 +105,57 @@ local log_level = vim.log.levels.WARN
 ---@return nil
 M.log = function(msg, ...) return vim.notify('[fzf] ' .. msg:format(...), log_level) end
 
----@return string
-M.curl = function(url) return vim.fn.system { 'curl', '-sL', url } end
-
 ---github restful api
---- ok -> false, msg
---- err -> true, str, tbl
-M.gh = function(route, opts)
-  local str
-  if vim.fn.executable('gh') == 0 then
-    str = M.curl('https://api.github.com/' .. route)
-  else
-    str = vim.system { 'gh', 'api', route }:wait().stdout
-  end
-  local ok, tbl = pcall(vim.json.decode, str, opts or {})
+---@param route string
+---@param cb fun(string, table)
+---@return vim.SystemObj
+local gh = function(route, cb)
+  local cmd = fn.executable('gh') == 1 and { 'gh', 'api', route }
+    or { 'curl', '-sL', 'https://api.github.com/' .. route }
 
-  if not ok or not tbl then --
-    return false, ('parse json failed on:\n%s'):format(str)
+  ---@return string, table
+  local parse_gh_result = function(str)
+    local ok, tbl = pcall(vim.json.decode, str)
+    if not ok then --
+      error(('Fail to parse json: ' .. str))
+    end
+    if tbl.message and tbl.message:match('API rate limit exceeded') then
+      error('API error: ' .. tbl.message)
+    end
+    return str, tbl
   end
-  if tbl.message and tbl.message:match('API rate limit exceeded') then
-    return false, ('API error: %s'):format(tbl.message)
-  end
-  return true, str, tbl
+
+  return vim.system(cmd, function(obj)
+    local stdout = obj.stdout
+    return cb(parse_gh_result(stdout))
+  end)
 end
 
 ---gh but use local cache first
 ---@param route string
 ---@param path string
----@param opts table? opts for vim.json.decode
----@return boolean?, string?, table?
-M.gh_cache = function(route, path, opts)
-  opts = opts or {}
-  if not vim.uv.fs_stat(path) then
-    local ok, err_or_str, tbl = M.gh(route, opts)
-    if ok then
-      local file_ok = M.write_file(path, err_or_str)
-      if not file_ok then return file_ok, 'write failed', tbl end
-    end
-    return ok, err_or_str, tbl
+---@param cb fun(string, table)
+---@return vim.SystemObj?
+local gh_cache = function(route, path, cb)
+  if uv.fs_stat(path) then
+    local str = assert(M.read_file(path))
+    local ok, tbl = pcall(vim.json.decode, str)
+    if not ok then error('Fail to parse json: ' .. str) end
+    return cb(str, tbl)
   end
-  local str = assert(M.read_file(path))
-  local ok, tbl = pcall(vim.json.decode, str, opts)
-  return ok, str, ok and tbl or nil
+  return gh(route, function(str, tbl)
+    assert(M.write_file(path, str), 'Fail to write to cache path: ' .. path)
+    cb(str, tbl)
+  end)
 end
 
----also gh_cache, assume the GET response is json (maybe simpler)
 ---@param route string
----@param root string?
----@param opts table? opts for vim.json.decode
----@return boolean?, string?, table?
-M.gh_cache_json = function(route, root, opts)
-  root = root or require('flo').getcfg().cache_dir
-  opts = opts or {}
+---@param cb fun(string, table)
+---@return vim.SystemObj?
+M.gh_cache = function(route, cb)
+  local root = require('flo.config').cache_dir
   local path = root .. '/' .. route .. '.json'
-  if not vim.uv.fs_stat(path) then
-    local ok, err_or_str, tbl = M.gh(route, opts)
-    if ok then
-      local file_ok = M.write_file(path, err_or_str, nil, { auto_create_dir = true })
-      if not file_ok then return file_ok, 'write failed', tbl end
-    end
-    return ok, err_or_str, tbl
-  end
-  local str = assert(M.read_file(path))
-  local ok, tbl = pcall(vim.json.decode, str, opts)
-  return ok, str, ok and tbl or nil
+  return gh_cache(route, path, cb)
 end
 
 -- snake to camel
