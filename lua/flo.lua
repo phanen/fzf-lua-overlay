@@ -1,5 +1,6 @@
 local M = {}
 
+local ls = 'eza'
 local notes_dir = '~/notes'
 
 -- dont care about side effect, just a global table i can use
@@ -44,7 +45,7 @@ local options = {
       fn = 'live_grep_glob',
       opts = {
         cwd = '~',
-        cmd = [[rg --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -L -e]],
+        cmd = [[rg ~ --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e]],
       },
     },
     todo_comment = {
@@ -54,13 +55,29 @@ local options = {
         no_esc = true,
       },
     },
+    zoxide = {
+      fn = 'fzf_exec',
+      opts = {
+        preview = ('%s -lh --color=always {}'):format(ls),
+        actions = {
+          ['enter'] = function(s) require('flo.util').zoxide_chdir(s[1]) end,
+          ['ctrl-l'] = function(s) require('fzf-lua').files { cwd = s[1] } end,
+          ['ctrl-n'] = function(s) require('fzf-lua').live_grep_native { cwd = s[1] } end,
+          ['ctrl-d'] = {
+            fn = function(s) vim.system { 'zoxide', 'remove', s[1] } end,
+            reload = true,
+          },
+        },
+      },
+      fzf_exec_arg = 'zoxide query -l',
+    },
   },
 }
 
 package.loaded['flo.config'] = options
 
 M.setup = function(opts)
-  options = opts and vim.tbl_deep_extend('force', options, opts) or options
+  if opts then options = vim.tbl_deep_extend('force', options, opts) end
   vim.fn.mkdir(vim.fn.expand(options.cache_dir), 'p')
   package.loaded['flo.config'] = options
 end

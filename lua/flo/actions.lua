@@ -1,4 +1,3 @@
-local options = require('flo.config')
 local M = {}
 
 -- workaround to fix circile require
@@ -90,31 +89,10 @@ local delete_files = function(paths)
   end
 end
 
+-- note: no warnings here since not useful
 M.file_delete = function(selected, opts)
-  -- prompt break `reload = true`
-  -- local _fn, _opts = opts.__call_fn, opts.__call_opts
-
-  -- may a log for undo? git reset?
   local paths = vim.tbl_map(function(v) return fzf.path.entry_to_file(v, opts).path end, selected)
-
   delete_files(paths)
-
-  -- fzf.fzf_exec({ 'YES', 'NO' }, {
-  --   prompt = ('Delete %s'):format(table.concat(paths, ' ')),
-  --   actions = {
-  --     ['default'] = function(sel)
-  --       if sel[1] == 'YES' then delete_files(paths) end
-  --       -- _fn(_opts)
-  --     end,
-  --   },
-  -- })
-
-  -- vim.ui.select({ 'y', 'n' }, {
-  --   prompt = 'delete or not?',
-  --   -- format_item = function(item) end,
-  -- }, function(choice)
-  --   if not choice:match('n') then delete_files(paths) end
-  -- end)
 end
 
 -- used by fzf's builtin file pickers
