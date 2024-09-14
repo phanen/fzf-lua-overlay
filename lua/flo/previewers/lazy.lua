@@ -158,12 +158,8 @@ function lazy_builtin:populate_preview_buf(entry_str)
     { 'sh', '-c', cmdline },
     ---@diagnostic disable-next-line: param-type-mismatch
     vim.schedule_wrap(function(obj)
-      local output = vim.split(obj.stdout, '\n')
-      local tmpbuf = self:get_tmp_buffer()
-      vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, output)
-      if self.filetype then vim.bo[tmpbuf].filetype = self.filetype end
-      self:set_preview_buf(tmpbuf)
-      self.win:update_scrollbar()
+      local content = vim.split(obj.stdout, '\n')
+      floutil.preview_with(self, content)
     end)
   )
 end

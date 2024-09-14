@@ -205,4 +205,12 @@ M.create_lru = function(storage)
   }
 end
 
+M.preview_with = function(_self, content)
+  local tmpbuf = _self:get_tmp_buffer()
+  vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, content)
+  if _self.filetype then vim.bo[tmpbuf].filetype = _self.filetype end
+  _self:set_preview_buf(tmpbuf)
+  _self.win:update_scrollbar()
+end
+
 return M

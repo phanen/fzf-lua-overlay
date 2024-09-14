@@ -1,6 +1,5 @@
 local floutil = require('flo.util')
 local builtin_previewer = require('fzf-lua.previewer.builtin')
-local api, _, _ = vim.api, vim.fn, vim.uv
 
 ---@type FzfLuaOverlaySpec
 local M = {}
@@ -27,12 +26,8 @@ function previewer:populate_preview_buf(entry_str)
     self.api_root .. '/' .. entry_str,
     vim.schedule_wrap(function(_, json)
       local content = assert(json[self.json_key])
-      local lines = vim.split(content, '\n')
-      local tmpbuf = self:get_tmp_buffer()
-      api.nvim_buf_set_lines(tmpbuf, 0, -1, false, lines)
-      vim.bo[tmpbuf].filetype = self.filetype
-      self:set_preview_buf(tmpbuf)
-      self.win:update_scrollbar()
+      content = vim.split(content, '\n')
+      floutil.preview_with(self, content)
     end)
   )
 end
