@@ -146,7 +146,7 @@ function lazy_builtin:populate_preview_buf(entry_str)
 
   local cmdline = handlers[t]
   if not cmdline then return end
-  if vim.is_callable(cmdline) == 'function' then cmdline = cmdline() end
+  if vim.is_callable(cmdline) then cmdline = cmdline() end
   if t == p_type.INS_MD or t == p_type.UNINS_GH then
     self.filetype = 'markdown'
   elseif t == p_type.LOCAL then
