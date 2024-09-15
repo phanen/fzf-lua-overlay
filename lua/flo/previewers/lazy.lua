@@ -52,10 +52,8 @@ local lazy_fzf = fzf_previewer.cmd_async:extend()
 function lazy_fzf:new(o, op, fzf_win)
   lazy_fzf.super.new(self, o, op, fzf_win)
   self.bat_cmd = 'bat --color=always --style=numbers,changes'
-  self.ls_cmd = ('%s -lh --color=always'):format(vim.fn.executable('eza') == 1 and 'eza' or 'ls')
-    .. '%s'
-  -- return self
-  return setmetatable(self, self)
+  self.ls_cmd = 'eza --color=always --tree --level=3 --icons=always {}'
+  return self
 end
 
 function lazy_fzf:cmdline(_)

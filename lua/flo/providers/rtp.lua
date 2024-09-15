@@ -6,13 +6,10 @@ M.fn = 'fzf_exec'
 -- TODO: refactor this
 local encode = require('flo.providers.scriptnames').encode
 
-M.opts = {
-  previewer = {
-    cmd = 'exa --color=always -l',
-    -- args = '-n',
-    _ctor = require('fzf-lua.previewer').fzf.cmd,
-  },
+local ls = 'eza --color=always --tree --level=3 --icons=always {}'
 
+M.opts = {
+  previewer = { cmd = ls, _ctor = require('fzf-lua.previewer').fzf.cmd },
   path_shorten = 'set-to-trigger-glob-expansion',
   actions = {
     ['default'] = function(selected)

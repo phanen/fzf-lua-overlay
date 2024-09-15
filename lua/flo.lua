@@ -1,6 +1,6 @@
 local M = {}
 
-local ls = 'eza'
+local ls = 'eza --color=always --tree --level=3 --icons=always {}'
 local notes_dir = '~/notes'
 
 -- dont care about side effect, just a global table i can use
@@ -8,6 +8,17 @@ local options = {
   cache_dir = (vim.g.state_path or vim.fn.stdpath 'state') .. '/fzf-lua-overlay',
   ---@type FzfLuaOverlaySpec[]
   specs = {
+    git_bcommits = {
+      fn = 'git_bcommits',
+      opts = {
+        actions = {
+          ['ctrl-o'] = function(s)
+            local commit = s[1]:match('[^ ]+')
+            vim.cmd.DiffviewOpen(commit)
+          end,
+        },
+      },
+    },
     find_notes = {
       fn = 'files',
       opts = {
@@ -58,12 +69,12 @@ local options = {
     zoxide = {
       fn = 'fzf_exec',
       opts = {
-        preview = ('%s -lh --color=always {}'):format(ls),
+        preview = ls,
         actions = {
           ['enter'] = function(s) require('flo.util').zoxide_chdir(s[1]) end,
           ['ctrl-l'] = function(s) require('fzf-lua').files { cwd = s[1] } end,
           ['ctrl-n'] = function(s) require('fzf-lua').live_grep_native { cwd = s[1] } end,
-          ['ctrl-d'] = {
+          ['ctrl-x'] = {
             fn = function(s) vim.system { 'zoxide', 'remove', s[1] } end,
             reload = true,
           },
