@@ -45,27 +45,9 @@ local options = {
         },
       },
     },
-    find_dots = {
-      fn = 'files',
-      opts = {
-        cwd = '~',
-        cmd = [[rg --color=never --files --hidden --follow -g "!.git" -L]], -- "-L" follows symlinks
-      },
-    },
-    grep_dots = {
-      fn = 'live_grep_glob',
-      opts = {
-        cwd = '~',
-        cmd = [[rg ~ --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e]],
-      },
-    },
-    todo_comment = {
-      fn = 'grep',
-      opts = {
-        search = 'TODO|HACK|PERF|NOTE|FIX',
-        no_esc = true,
-      },
-    },
+    find_dots = { fn = 'files', opts = { cwd = '~' } },
+    grep_dots = { fn = 'live_grep_glob', opts = { cwd = '~' } },
+    todo_comment = { fn = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
     zoxide = {
       fn = 'fzf_exec',
       opts = {
