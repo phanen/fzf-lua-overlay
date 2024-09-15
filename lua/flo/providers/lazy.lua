@@ -48,7 +48,7 @@ end
 local all_name = actions_builder(function() return true end, function(p) return p.name end)
 local all_repo = actions_builder(function() return true end, disp_repo)
 
-M.fzf_exec_arg = all_name
+M.contents = all_name
 
 local is_repo
 if false then
@@ -56,7 +56,7 @@ if false then
     local disp = is_repo and disp_repo or function(p) return p.name end
     actions_builder(function() return true end, disp)(fzf_cb)
   end
-  M.fzf_exec_arg = all_reloadable
+  M.contents = all_reloadable
 end
 
 -- sequentially run cb on selected (plugins)

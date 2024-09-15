@@ -27,7 +27,7 @@ M.opts = {
   },
 }
 
-M.fzf_exec_arg = function(fzf_cb)
+M.contents = function(fzf_cb)
   coroutine.wrap(function()
     local co = coroutine.running()
     local rtps = vim.api.nvim_list_runtime_paths()

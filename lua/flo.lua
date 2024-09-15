@@ -62,7 +62,7 @@ local options = {
           },
         },
       },
-      fzf_exec_arg = 'zoxide query -l',
+      contents = 'zoxide query -l',
     },
   },
 }
@@ -93,7 +93,7 @@ end
 ---@field fn string|function api's name or custom function
 ---@field inherit? string inherit which opts
 ---@field opts table
----@field fzf_exec_arg? function|string only used for fzf_exec
+---@field contents? (string|number)[]|fun(fzf_cb: fun(entry?: string|number, cb?: function))|string|nil
 
 ---@generic T, K
 ---@param func fun(arg1:T):K
@@ -151,7 +151,7 @@ local apis = once(function(k)
     )
 
     local fzf = type(spec.fn) == 'function' and spec.fn or require('fzf-lua')[spec.fn]
-    if spec.fzf_exec_arg then return fzf(spec.fzf_exec_arg, opts) end
+    if spec.contents then return fzf(spec.contents, opts) end
     return fzf(opts)
   end
 end)

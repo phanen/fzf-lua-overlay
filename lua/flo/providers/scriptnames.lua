@@ -61,7 +61,7 @@ M.encode = encode
 local devicons = require 'fzf-lua.devicons'
 local fzfutil = require 'fzf-lua.utils'
 
-M.fzf_exec_arg = function(fzf_cb)
+M.contents = function(fzf_cb)
   local function add_entry(x, co)
     local ret = {}
     local icon, hl = devicons.get_devicon(x)

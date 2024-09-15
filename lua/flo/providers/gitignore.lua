@@ -53,7 +53,7 @@ M.opts = {
   },
 }
 
-M.fzf_exec_arg = function(fzf_cb)
+M.contents = function(fzf_cb)
   floutil.gh_cache(api_root, function(_, json)
     coroutine.wrap(function()
       local co = coroutine.running()
