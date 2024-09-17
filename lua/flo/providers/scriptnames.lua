@@ -2,7 +2,7 @@
 local M = {}
 
 M.fn = 'fzf_exec'
-M.inherit = 'files' -- it seems also enable globbing expand in `normalize_opts`
+M.inherit = 'oldfiles' -- glob expand
 
 local fp = require 'fzf-lua.path'
 local entry_to_file = function(entry)
@@ -14,6 +14,8 @@ end
 M.opts = {
   -- previewer = 'builtin',
   path_shorten = 'set-to-trigger-glob-expansion',
+  winopts = { preview = { hidden = 'nohidden' } },
+  -- file_icons = true,
   actions = {
     ['default'] = function(selected, _)
       vim.iter(selected):each(function(sel) vim.cmd.e(entry_to_file(sel)) end)
@@ -56,7 +58,7 @@ local encode = function(name)
 end
 
 -- export here to be used in rtp provider
-M.encode = encode
+M._encode = encode
 
 local devicons = require 'fzf-lua.devicons'
 local fzfutil = require 'fzf-lua.utils'

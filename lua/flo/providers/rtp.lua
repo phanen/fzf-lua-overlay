@@ -3,8 +3,7 @@ local M = {}
 
 M.fn = 'fzf_exec'
 
--- TODO: refactor this
-local encode = require('flo.providers.scriptnames').encode
+local encode = require('flo.providers.scriptnames')._encode
 
 local ls = 'eza --color=always --tree --level=3 --icons=always {}'
 
