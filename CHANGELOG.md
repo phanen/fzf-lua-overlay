@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.2.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.1.0...v2.2.0) (2024-09-17)
+
+
+### Features
+
+* ls, bcommits ([d2e47b3](https://github.com/phanen/fzf-lua-overlay/commit/d2e47b396bfccd3e2b3618adca915dc84982804d))
+
+
+### Bug Fixes
+
+* async preview ([d86cf8e](https://github.com/phanen/fzf-lua-overlay/commit/d86cf8e877a31683494885b3b402af4a60f81375))
+* correct inherit ([532effd](https://github.com/phanen/fzf-lua-overlay/commit/532effdf24b309306d833e2333ab7b7490f5f30b))
+* decorate with md syntax ([b3b7869](https://github.com/phanen/fzf-lua-overlay/commit/b3b78690f7319b411da82004d139c8c30313c841))
+* don't pass query ([ef2c5ef](https://github.com/phanen/fzf-lua-overlay/commit/ef2c5efef92f7219117bd2b1a699782c3999f18f))
+* force create dir ([007e55a](https://github.com/phanen/fzf-lua-overlay/commit/007e55acf6cf0ab7679ce057655411c197fd5406))
+* lazy loading ([71849a9](https://github.com/phanen/fzf-lua-overlay/commit/71849a99a8933991c616b3eae6f058665280a62e))
+* multiplex ([de221b4](https://github.com/phanen/fzf-lua-overlay/commit/de221b48e86027ae81d666b412c54c851fe35daf))
+* no fzf-lua deps in utils ([148808a](https://github.com/phanen/fzf-lua-overlay/commit/148808ac0bcf8114283109016e162b73ac4f73e1))
+* not resume after enter (regression) ([7bcab42](https://github.com/phanen/fzf-lua-overlay/commit/7bcab42d273b5e145b48063b1ae5ba3281ac0ace))
+* **recent:** buf/closed/shada ([4a1c757](https://github.com/phanen/fzf-lua-overlay/commit/4a1c75785ccc748c60a99b4a1affca476bdcf67e))
+* remove state file ([53beb83](https://github.com/phanen/fzf-lua-overlay/commit/53beb837b9fdcaa187dba2c954a7ede8118d4773))
+* typing ([6b4336d](https://github.com/phanen/fzf-lua-overlay/commit/6b4336d11b58701912fa99280608b2943a8d5625))
+* typo ([5c6bc69](https://github.com/phanen/fzf-lua-overlay/commit/5c6bc6997e1788a09f7cda48a9e68c3eaa9a286b))
+* when no match ([ef9d906](https://github.com/phanen/fzf-lua-overlay/commit/ef9d906e056d7d3f7fb5e287fc69643a69ea6b9b))
+* workaroud for some potential circle require ([abceb7f](https://github.com/phanen/fzf-lua-overlay/commit/abceb7f393cfe013ae3d0f5b5d8eb7bce434ee95))
+
 ## [2.1.1](https://github.com/phanen/fzf-lua-overlay/compare/v2.1.0...v2.1.1) (2024-09-01)
 
 
