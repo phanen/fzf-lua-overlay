@@ -120,13 +120,15 @@ local specs = once(function(k)
       spec = or_err
     end
   end
-  spec.opts = vim.tbl_deep_extend('force', spec.opts, {
-    prompt = false,
-    winopts = { -- override default-title profile (#1)
-      title = '[' .. k .. ']',
-      title_pos = 'center',
-    },
-  })
+  if k ~= 'resume' then
+    spec.opts = vim.tbl_deep_extend('force', spec.opts, {
+      prompt = false,
+      winopts = { -- override default-title profile (#1)
+        title = '[' .. k .. ']',
+        title_pos = 'center',
+      },
+    })
+  end
   return spec
 end)
 
