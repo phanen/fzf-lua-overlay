@@ -14,8 +14,8 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 ==============================================================================
 1. fzf-lua-overlay                           *fzf-lua-overlay-fzf-lua-overlay*
 
-<https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml> Strong
-defaults and new pickers for fzf-lua.
+<https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml> Wrapper
+and pickers for fzf-lua <https://github.com/ibhagwan/fzf-lua>.
 
 mp4: showcase
 <https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d>
@@ -76,7 +76,7 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
 
 REQUIREMENT                      *fzf-lua-overlay-fzf-lua-overlay-requirement*
 
-`flo.recentfiles`need init `_G.__recent_hlist` (since `vim.g` is buggy,
+`flo.recentfiles`initialize `_G.__recent_hlist` (since `vim.g` is buggy,
 https://github.com/neovim/neovim/issues/20107)
 
 >lua
@@ -101,7 +101,7 @@ CREDIT                                *fzf-lua-overlay-fzf-lua-overlay-credit*
 
 TODO                                    *fzf-lua-overlay-fzf-lua-overlay-todo*
 
-- integration with dirstack.nvim
+- integration with dirstack.nvim  <https://github.com/phanen/dirstack.nvim/commit/f5efd5e8c7768c22d2d52f6d1ae827a54ccaf41>
 - inject new pickers into fzflua builtin
 
 ==============================================================================
