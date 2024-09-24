@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.0...v2.3.1) (2024-09-24)
+
+
+### Bug Fixes
+
+* typos ([f6dea82](https://github.com/phanen/fzf-lua-overlay/commit/f6dea82ed4c3ec742595c19620e105dada64f4a5))
+
 ## [2.3.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.2.0...v2.3.0) (2024-09-24)
 
 
