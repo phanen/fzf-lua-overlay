@@ -16,11 +16,7 @@ Strong defaults and new pickers for fzf-lua.
 ## usage
 > <https://github.com/phanen/.dotfiles/blob/master/.config/nvim/lua/pack/fzf.lua>
 ```lua
-local fl = setmetatable({}, {
-  __index = function(_, k)
-    return ([[<cmd>lua require('flo').%s()<cr>]]):format(k)
-  end,
-})
+local fl = setmetatable({}, { __index = function(_, k) return ([[<cmd>lua require('flo').%s()<cr>]]):format(k) end })
 
 return {
   {
@@ -28,7 +24,6 @@ return {
     'phanen/fzf-lua-overlay',
     main = 'flo',
     cond = not vim.g.vscode,
-    init = function() require('flo').init() end,
     -- stylua: ignore
     keys = {
       -- try new pickers
@@ -57,8 +52,19 @@ return {
 }
 ```
 
-## config
-* <https://github.com/phanen/fzf-lua-overlay/blob/master/lua/fzf-lua-overlay/config.lua>
+## requirement
+`flo.recentfiles`: need init `_G.__recent_hlist` (since `vim.g` is buggy, https://github.com/neovim/neovim/issues/20107)
+```lua
+vim.api.nvim_create_autocmd("BufDelete", {
+  callback = function(ev)
+    if not _G.__recent_hlist then _G.__recent_hlist = require('flo.hashlist') {} end
+    -- ignore no name buffer on enter...
+    if api.nvim_buf_get_name(ev.buf) == '' then return end
+    print(ev.match)
+    _G.__recent_hlist:access(ev.match)
+  end,
+})
+```
 
 ## credit
 * <https://github.com/ibhagwan/fzf-lua>
@@ -66,6 +72,5 @@ return {
 * <https://github.com/roginfarrer/fzf-lua-lazy.nvim>
 
 ## todo
+* [x] integration with dirstack.nvim
 * [ ] inject new pickers into fzflua builtin
-* [ ] boardcast/pull session from other neovim instance by some what actions?
-* [ ] integration with dirstack.nvim

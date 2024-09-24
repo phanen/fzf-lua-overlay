@@ -134,4 +134,10 @@ M.file_edit_bg = function(selected, opts)
   end
 end
 
+M.run_builtin = function(selected)
+  local method = selected[1]
+  vim.print(method)
+  pcall(assert(loadstring(string.format("require'flo'.%s()", method))))
+end
+
 return M

@@ -1,11 +1,6 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-local sess_files = package.loaded['flo.state'].session_files
-
----@diagnostic disable-next-line: inject-field
-M._lru = require('flo.util').create_lru(sess_files)
-
 M.inherit = 'oldfiles'
 
 -- FIXME: twice `normalize_opts` in current overlay structure...
@@ -45,14 +40,15 @@ M.fn = function(opts)
       --   bufmap[buf.name] = true
       -- end
 
-      M._lru.foreach(function(file)
+      _G.__recent_hlist:foreach(function(node)
+        local file = node.key
         if stat_fn(file) and file ~= curr_file then add_entry(file, co) end
       end)
       vim
         .iter(vim.v.oldfiles)
         :filter(stat_fn)
         :filter(function(file) return file ~= curr_file end)
-        :filter(function(file) return not sess_files[file] end)
+        :filter(function(file) return not _G.__recent_hlist.hash[file] end)
         :each(function(file) add_entry(file, co) end)
       fzf_cb()
     end)()

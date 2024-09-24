@@ -75,20 +75,6 @@ M.setup = function(opts)
   package.loaded['flo.config'] = options
 end
 
-M.init = function()
-  local group = vim.api.nvim_create_augroup('FzfLuaOverlay', {})
-  vim.api.nvim_create_autocmd('BufDelete', {
-    group = group,
-    callback = function(args)
-      package.loaded['flo.state'] = { session_files = {} }
-      -- workaround for open no name buffer on enter...
-      if vim.api.nvim_buf_get_name(args.buf) == '' then return end
-      local filename = args.match
-      require('flo.providers.recentfiles')._lru.access(filename)
-    end,
-  })
-end
-
 ---@class FzfLuaOverlaySpec
 ---@field fn string|function api's name or custom function
 ---@field inherit? string inherit which opts
