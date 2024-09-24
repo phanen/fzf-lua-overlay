@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.2.0...v2.3.0) (2024-09-24)
+
+
+### Features
+
+* mimic builtin ([1bcc93d](https://github.com/phanen/fzf-lua-overlay/commit/1bcc93dfb7bae776f8f6804e12c94ef766f04122))
+
+
+### Bug Fixes
+
+* drop hashlist init ([e4970f9](https://github.com/phanen/fzf-lua-overlay/commit/e4970f92b763c88bb65e80f8da7a84d12c83d423))
+
 ## [2.2.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.1.0...v2.2.0) (2024-09-17)
 
 
