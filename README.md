@@ -73,4 +73,4 @@ vim.api.nvim_create_autocmd("BufDelete", {
 
 ## todo
 * [x] integration with dirstack.nvim
-* [ ] inject new pickers into fzflua builtin
+* [x] inject new pickers into fzflua builtin

@@ -144,4 +144,29 @@ local apis = once(function(k)
   end
 end)
 
+M.builtin = function(opts)
+  opts = require('fzf-lua.config').normalize_opts(opts, 'builtin')
+  local override = {
+    prompt = 'Builtin> ',
+    actions = { ['enter'] = require('flo.actions').run_builtin },
+  }
+  opts = vim.tbl_deep_extend('force', opts or {}, override)
+  opts.metatable = vim.tbl_extend('force', require('fzf-lua'), {
+    find_notes = true,
+    find_dots = true,
+    grep_notes = true,
+    grep_dots = true,
+    gitignore = true,
+    todo_comment = true,
+    zoxide = true,
+    lazy = true,
+    license = true,
+    recentfiles = true,
+    rtp = true,
+    scriptnames = true,
+  })
+  opts.metatable_exclude = require('fzf-lua')._excluded_metamap
+  return require 'fzf-lua.providers.module'.metatable(opts)
+end
+
 return setmetatable(M, { __index = apis })
