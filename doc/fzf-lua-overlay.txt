@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*    For Neovim >= 0.8.0    Last change: 2024 September 20
+*fzf-lua-overlay.txt*    For Neovim >= 0.8.0    Last change: 2024 September 24
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -6,7 +6,7 @@ Table of Contents                          *fzf-lua-overlay-table-of-contents*
 1. fzf-lua-overlay                           |fzf-lua-overlay-fzf-lua-overlay|
   - features                        |fzf-lua-overlay-fzf-lua-overlay-features|
   - usage                              |fzf-lua-overlay-fzf-lua-overlay-usage|
-  - config                            |fzf-lua-overlay-fzf-lua-overlay-config|
+  - requirement                  |fzf-lua-overlay-fzf-lua-overlay-requirement|
   - credit                            |fzf-lua-overlay-fzf-lua-overlay-credit|
   - todo                                |fzf-lua-overlay-fzf-lua-overlay-todo|
 2. Links                                               |fzf-lua-overlay-links|
@@ -37,11 +37,7 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
 
   <https://github.com/phanen/.dotfiles/blob/master/.config/nvim/lua/pack/fzf.lua>
 >lua
-    local fl = setmetatable({}, {
-      __index = function(_, k)
-        return ([[<cmd>lua require('flo').%s()<cr>]]):format(k)
-      end,
-    })
+    local fl = setmetatable({}, { __index = function(_, k) return ([[<cmd>lua require('flo').%s()<cr>]]):format(k) end })
     
     return {
       {
@@ -49,7 +45,6 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
         'phanen/fzf-lua-overlay',
         main = 'flo',
         cond = not vim.g.vscode,
-        init = function() require('flo').init() end,
         -- stylua: ignore
         keys = {
           -- try new pickers
@@ -79,9 +74,22 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
 <
 
 
-CONFIG                                *fzf-lua-overlay-fzf-lua-overlay-config*
+REQUIREMENT                      *fzf-lua-overlay-fzf-lua-overlay-requirement*
 
-- <https://github.com/phanen/fzf-lua-overlay/blob/master/lua/fzf-lua-overlay/config.lua>
+`flo.recentfiles`need init `_G.__recent_hlist` (since `vim.g` is buggy,
+https://github.com/neovim/neovim/issues/20107)
+
+>lua
+    vim.api.nvim_create_autocmd("BufDelete", {
+      callback = function(ev)
+        if not _G.__recent_hlist then _G.__recent_hlist = require('flo.hashlist') {} end
+        -- ignore no name buffer on enter...
+        if api.nvim_buf_get_name(ev.buf) == '' then return end
+        print(ev.match)
+        _G.__recent_hlist:access(ev.match)
+      end,
+    })
+<
 
 
 CREDIT                                *fzf-lua-overlay-fzf-lua-overlay-credit*
@@ -93,9 +101,8 @@ CREDIT                                *fzf-lua-overlay-fzf-lua-overlay-credit*
 
 TODO                                    *fzf-lua-overlay-fzf-lua-overlay-todo*
 
-- inject new pickers into fzflua builtin
-- boardcast/pull session from other neovim instance by some what actions?
 - integration with dirstack.nvim
+- inject new pickers into fzflua builtin
 
 ==============================================================================
 2. Links                                               *fzf-lua-overlay-links*
