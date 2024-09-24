@@ -1,6 +1,6 @@
 # fzf-lua-overlay
 [![CI](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml)
-Strong defaults and new pickers for fzf-lua.
+Wrapper and pickers for [fzf-lua](https://github.com/ibhagwan/fzf-lua).
 
 [mp4: showcase](https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d)
 
@@ -53,7 +53,7 @@ return {
 ```
 
 ## requirement
-`flo.recentfiles`: need init `_G.__recent_hlist` (since `vim.g` is buggy, https://github.com/neovim/neovim/issues/20107)
+`flo.recentfiles`: initialize `_G.__recent_hlist` (since `vim.g` is buggy, https://github.com/neovim/neovim/issues/20107)
 ```lua
 vim.api.nvim_create_autocmd("BufDelete", {
   callback = function(ev)
@@ -72,5 +72,5 @@ vim.api.nvim_create_autocmd("BufDelete", {
 * <https://github.com/roginfarrer/fzf-lua-lazy.nvim>
 
 ## todo
-* [x] integration with dirstack.nvim
+* [x] integration with dirstack.nvim (https://github.com/phanen/dirstack.nvim/commit/f5efd5e8c7768c22d2d52f6d1ae827a54ccaf416)
 * [x] inject new pickers into fzflua builtin
