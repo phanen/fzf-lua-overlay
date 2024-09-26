@@ -40,15 +40,17 @@ M.fn = function(opts)
       --   bufmap[buf.name] = true
       -- end
 
-      _G.__recent_hlist:foreach(function(node)
-        local file = node.key
-        if stat_fn(file) and file ~= curr_file then add_entry(file, co) end
-      end)
+      if _G.__recent_hlist then
+        _G.__recent_hlist:foreach(function(node)
+          local file = node.key
+          if stat_fn(file) and file ~= curr_file then add_entry(file, co) end
+        end)
+      end
       vim
         .iter(vim.v.oldfiles)
         :filter(stat_fn)
         :filter(function(file) return file ~= curr_file end)
-        :filter(function(file) return not _G.__recent_hlist.hash[file] end)
+        :filter(function(file) return not _G.__recent_hlist or not _G.__recent_hlist.hash[file] end)
         :each(function(file) add_entry(file, co) end)
       fzf_cb()
     end)()
