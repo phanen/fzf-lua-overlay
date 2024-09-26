@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.2](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.1...v2.3.2) (2024-09-26)
+
+
+### Bug Fixes
+
+* when `__recent_hlist` is nil ([e9554d0](https://github.com/phanen/fzf-lua-overlay/commit/e9554d0bee07fef35192c5fe04806eeae15cf477))
+
 ## [2.3.1](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.0...v2.3.1) (2024-09-24)
 
 
