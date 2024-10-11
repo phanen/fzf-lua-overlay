@@ -17,7 +17,6 @@ end
 ---@field fn string|function api's name or custom function
 ---@field inherit? string inherit which opts
 ---@field opts? table
----@field contents? (string|number)[]|fun(fzf_cb: fun(entry?: string|number, cb?: function))|string|nil
 
 ---@generic T, K
 ---@param func fun(arg1:T):K
@@ -67,17 +66,15 @@ local apis = once(function(k)
     local spec = specs[k] ---@type FzfLuaOverlaySpec
 
     -- also handle stuffs like devicons/globbing transform...
-    local opts = spec.inherit and require('fzf-lua.config').normalize_opts({}, spec.inherit) or {}
-    opts = vim.tbl_deep_extend(
+    local opts = vim.tbl_deep_extend(
       'force',
-      opts,
+      spec.inherit and require('fzf-lua.config').normalize_opts(nil, spec.inherit) or {},
       spec.opts or {},
       no_query[k] and {} or { query = table.concat(require('flo.util').getregion()) }, -- this enable resuming after `enter`
       call_opts or {}
     )
 
     local fzf = type(spec.fn) == 'function' and spec.fn or require('fzf-lua')[spec.fn]
-    if spec.contents then return fzf(spec.contents, opts) end
     return fzf(opts)
   end
 end)

@@ -4,8 +4,6 @@ local _, fn, uv = vim.api, vim.fn, vim.uv
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.fn = 'fzf_exec'
-
 local api_root = 'licenses'
 local previewer = require('flo.providers.gitignore').opts.previewer._ctor():extend()
 function previewer:new(o, opts, fzf_win)
@@ -41,17 +39,20 @@ M.opts = {
   },
 }
 
-M.contents = function(fzf_cb)
-  floutil.gh_cache('licenses', function(_, json)
-    coroutine.wrap(function()
-      local co = coroutine.running()
-      vim.iter(json):each(function(item)
-        fzf_cb(item.key, function() coroutine.resume(co) end)
-        coroutine.yield()
-      end)
-      fzf_cb()
-    end)()
-  end)
+M.fn = function(opts)
+  local contents = function(fzf_cb)
+    floutil.gh_cache('licenses', function(_, json)
+      coroutine.wrap(function()
+        local co = coroutine.running()
+        vim.iter(json):each(function(item)
+          fzf_cb(item.key, function() coroutine.resume(co) end)
+          coroutine.yield()
+        end)
+        fzf_cb()
+      end)()
+    end)
+  end
+  return require('fzf-lua').fzf_exec(contents, opts)
 end
 
 return M

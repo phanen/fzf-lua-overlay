@@ -69,7 +69,7 @@ return {
           opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true },
         },
         zoxide = {
-          fn = 'fzf_exec',
+          fn = function(opts) return require('fzf-lua').fzf_exec('zoxide query -l', opts) end,
           opts = {
             preview = '',
             actions = {
@@ -82,7 +82,6 @@ return {
               },
             },
           },
-          contents = 'zoxide query -l',
         },
       },
     },

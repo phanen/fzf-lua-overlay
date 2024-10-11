@@ -4,8 +4,6 @@ local builtin_previewer = require('fzf-lua.previewer.builtin')
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.fn = 'fzf_exec'
-
 local api_root = 'gitignore/templates'
 local previewer = builtin_previewer.buffer_or_file:extend()
 
@@ -53,17 +51,20 @@ M.opts = {
   },
 }
 
-M.contents = function(fzf_cb)
-  floutil.gh_cache(api_root, function(_, json)
-    coroutine.wrap(function()
-      local co = coroutine.running()
-      vim.iter(json):each(function(item)
-        fzf_cb(item, function() coroutine.resume(co) end)
-        coroutine.yield()
-      end)
-      fzf_cb()
-    end)()
-  end)
+M.fn = function(opts)
+  local contents = function(fzf_cb)
+    floutil.gh_cache(api_root, function(_, json)
+      coroutine.wrap(function()
+        local co = coroutine.running()
+        vim.iter(json):each(function(item)
+          fzf_cb(item, function() coroutine.resume(co) end)
+          coroutine.yield()
+        end)
+        fzf_cb()
+      end)()
+    end)
+  end
+  return require('fzf-lua').fzf_exec(contents, opts)
 end
 
 return M

@@ -1,14 +1,13 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.fn = 'fzf_exec'
-
 local encode = require('flo.providers.scriptnames')._encode
 
-local ls = 'eza --color=always --tree --level=3 --icons=always {}'
-
 M.opts = {
-  previewer = { cmd = ls, _ctor = require('fzf-lua.previewer').fzf.cmd },
+  previewer = {
+    cmd = 'eza --color=always --tree --level=3 --icons=always {}',
+    _ctor = require('fzf-lua.previewer').fzf.cmd,
+  },
   path_shorten = 'set-to-trigger-glob-expansion',
   actions = {
     ['default'] = function(selected)
@@ -26,16 +25,19 @@ M.opts = {
   },
 }
 
-M.contents = function(fzf_cb)
-  coroutine.wrap(function()
-    local co = coroutine.running()
-    local rtps = vim.api.nvim_list_runtime_paths()
-    for _, rtp in ipairs(rtps) do
-      fzf_cb(encode(rtp), function() coroutine.resume(co) end)
-      coroutine.yield()
-    end
-    fzf_cb()
-  end)()
+M.fn = function(opts)
+  local contents = function(fzf_cb)
+    coroutine.wrap(function()
+      local co = coroutine.running()
+      local rtps = vim.api.nvim_list_runtime_paths()
+      for _, rtp in ipairs(rtps) do
+        fzf_cb(encode(rtp), function() coroutine.resume(co) end)
+        coroutine.yield()
+      end
+      fzf_cb()
+    end)()
+  end
+  return require('fzf-lua').fzf_exec(contents, opts)
 end
 
 return M

@@ -1,6 +1,5 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
-M.fn = 'fzf_exec'
 
 -- tbh lazy load is not necessary now, just use alias here
 local floutil = require('flo.util')
@@ -48,16 +47,7 @@ end
 local all_name = actions_builder(function() return true end, function(p) return p.name end)
 local all_repo = actions_builder(function() return true end, disp_repo)
 
-M.contents = all_name
-
-local is_repo
-if false then
-  local all_reloadable = function(fzf_cb)
-    local disp = is_repo and disp_repo or function(p) return p.name end
-    actions_builder(function() return true end, disp)(fzf_cb)
-  end
-  M.contents = all_reloadable
-end
+M.fn = function(opts) return require('fzf-lua').fzf_exec(all_name, opts) end
 
 -- sequentially run cb on selected (plugins)
 ---@param cb fun(plugins)

@@ -1,23 +1,18 @@
 ---@type FzfLuaOverlaySpec
 local M = {}
 
-M.fn = 'fzf_exec'
-M.inherit = 'oldfiles' -- glob expand
-
-local fp = require 'fzf-lua.path'
-local entry_to_file = function(entry)
-  local path = fp.entry_to_file(entry).path
-  path = vim.fn.glob(path)
-  return path
-end
-
 M.opts = {
-  -- previewer = 'builtin',
+  previewer = 'builtin',
   path_shorten = 'set-to-trigger-glob-expansion',
   winopts = { preview = { hidden = 'nohidden' } },
-  -- file_icons = true,
+  file_icons = true,
   actions = {
     ['default'] = function(selected, _)
+      local entry_to_file = function(entry)
+        local path = require('fzf-lua.path').entry_to_file(entry).path
+        path = vim.fn.glob(path)
+        return path
+      end
       vim.iter(selected):each(function(sel) vim.cmd.e(entry_to_file(sel)) end)
     end,
   },
@@ -57,39 +52,40 @@ local encode = function(name)
   return name
 end
 
--- export here to be used in rtp provider
+---@diagnostic disable-next-line: inject-field
 M._encode = encode
 
-local devicons = require 'fzf-lua.devicons'
-local fzfutil = require 'fzf-lua.utils'
+M.fn = function(opts)
+  local devicons = require 'fzf-lua.devicons'
+  local fzfutil = require 'fzf-lua.utils'
+  local contents = function(fzf_cb)
+    local function add_entry(x, co)
+      local ret = {}
+      local icon, hl = devicons.get_devicon(x)
+      if hl then icon = fzfutil.ansi_from_rgb(hl, icon) end
+      ret[#ret + 1] = icon
+      ret[#ret + 1] = fzfutil.nbsp
+      ret[#ret + 1] = encode(x)
+      -- x = encode(x)
+      x = table.concat(ret)
 
-M.contents = function(fzf_cb)
-  local function add_entry(x, co)
-    local ret = {}
-    local icon, hl = devicons.get_devicon(x)
-    if hl then icon = fzfutil.ansi_from_rgb(hl, icon) end
-    ret[#ret + 1] = icon
-    ret[#ret + 1] = fzfutil.nbsp
-    ret[#ret + 1] = encode(x)
-    -- x = encode(x)
-    x = table.concat(ret)
-
-    if not x then return end
-    fzf_cb(x, function(err)
-      coroutine.resume(co)
-      if err then fzf_cb() end
-    end)
-    coroutine.yield()
-  end
-
-  coroutine.wrap(function()
-    local co = coroutine.running()
-    local infos = vim.fn.getscriptinfo()
-    for _, info in ipairs(infos) do
-      add_entry(info.name, co)
+      if not x then return end
+      fzf_cb(x, function(err)
+        coroutine.resume(co)
+        if err then fzf_cb() end
+      end)
+      coroutine.yield()
     end
-    fzf_cb()
-  end)()
-end
 
+    coroutine.wrap(function()
+      local co = coroutine.running()
+      local infos = vim.fn.getscriptinfo()
+      for _, info in ipairs(infos) do
+        add_entry(info.name, co)
+      end
+      fzf_cb()
+    end)()
+  end
+  return require('fzf-lua').fzf_exec(contents, opts)
+end
 return M
