@@ -1,6 +1,14 @@
-local builtin_previewer = require('fzf-lua.previewer.builtin')
-local fzf_previewer = require('fzf-lua.previewer.fzf')
+local M = {}
+local previewer = require('fzf-lua.previewer.builtin')
 local floutil = require('flo.util')
+
+local preview_with = function(_self, content)
+  local tmpbuf = _self:get_tmp_buffer()
+  vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, content)
+  if _self.filetype then vim.bo[tmpbuf].filetype = _self.filetype end
+  _self:set_preview_buf(tmpbuf)
+  _self.win:update_scrollbar()
+end
 
 local github_raw_url = function(url, filepath)
   return url:gsub('github.com', 'raw.githubusercontent.com'):gsub('%.git$', '')
@@ -47,56 +55,10 @@ local parse_plugin_type = function(_, plugin)
   return p_type.INS_NO_MD
 end
 
-local lazy_fzf = fzf_previewer.cmd_async:extend()
+M.lazy = previewer.base:extend()
 
-function lazy_fzf:new(o, op, fzf_win)
-  lazy_fzf.super.new(self, o, op, fzf_win)
-  self.bat_cmd = 'bat --color=always --style=numbers,changes'
-  self.ls_cmd = 'eza --color=always --tree --level=3 --icons=always {}'
-  return self
-end
-
-function lazy_fzf:cmdline(_)
-  return require('fzf-lua').shell.raw_preview_action_cmd(function(items, _)
-    local plugin = parse_entry(self, items[1])
-    local t, data = parse_plugin_type(self, plugin)
-
-    local handlers = {
-      -- TODO: parse local dir (absolute, or relative to vim.fn.stdpath('config'))
-      [p_type.LOCAL] = 'echo Local module!',
-
-      -- https://raw.githubusercontent.com/author/repo/master/README.md
-      -- main? master
-      -- FIXME: 1. if subprocess false, still return 0; 2. 404 is even not a false (drop output if 404?)
-      -- anyway, we just always run both commands here
-      [p_type.UNINS_GH] = function()
-        return ('echo "> Not Installed (fetch from github)!\n" && { curl -sL %s  | %s --language md; }; { curl -sL %s | %s --language md; }'):format(
-          github_raw_url(plugin.url, 'README.md'),
-          self.bat_cmd,
-          github_raw_url(plugin.url, 'readme.md'),
-          self.bat_cmd
-        )
-      end,
-
-      [p_type.UNINS_NO_GH] = 'echo "> Not Installed (not github)"!',
-
-      -- TODO: buffer_or_file/quickfix
-      [p_type.INS_MD] = ('%s %s'):format(self.bat_cmd, data),
-
-      [p_type.INS_NO_MD] = self.ls_cmd:format(plugin.dir),
-    }
-    local cmdline = handlers[t]
-    if type(cmdline) == 'function' then cmdline = cmdline() end
-    if cmdline then return cmdline end
-    return 'echo Unknown plugin type!'
-  end, '{}', self.opts.debug)
-end
-
-local lazy_builtin = builtin_previewer.base:extend()
--- local lazy_builtin = builtin_previewer.buffer_or_file:extend()
-
-function lazy_builtin:new(o, opts, fzf_win)
-  lazy_builtin.super.new(self, o, opts, fzf_win)
+function M.lazy:new(o, opts, fzf_win)
+  M.lazy.super.new(self, o, opts, fzf_win)
   -- self.filetype = 'man'
   self.cmd = o.cmd or 'man -c %s | col -bx'
   self.cmd = type(self.cmd) == 'function' and self.cmd() or self.cmd
@@ -104,10 +66,10 @@ function lazy_builtin:new(o, opts, fzf_win)
   -- lazy_builtin.super.new(self, o, op, fzf_win)
   self.ls_cmd = 'ls -lh'
   -- FIXME: why this is needed (why fzf previewer don't needed this...)
-  return setmetatable(self, self)
+  return self
 end
 
-function lazy_builtin:populate_preview_buf(entry_str)
+function M.lazy:populate_preview_buf(entry_str)
   if entry_str == '' then
     self:clear_preview_buf(true)
     return
@@ -157,13 +119,34 @@ function lazy_builtin:populate_preview_buf(entry_str)
     ---@diagnostic disable-next-line: param-type-mismatch
     vim.schedule_wrap(function(obj)
       local content = vim.split(obj.stdout, '\n')
-      floutil.preview_with(self, content)
+      preview_with(self, content)
     end)
   )
 end
 
-return {
-  fzf = lazy_fzf,
-  builtin = lazy_builtin,
-  -- builtin = lazy_fzf,
-}
+M.gitignore = previewer.buffer_or_file:extend()
+
+function M.gitignore:new(o, opts, fzf_win)
+  M.gitignore.super.new(self, o, opts, fzf_win)
+  self.api_root = opts.api_root
+  self.filetype = opts.filetype
+  self.json_key = opts.json_key
+  return self
+end
+
+function M.gitignore:populate_preview_buf(entry_str)
+  if entry_str == '' then
+    self:clear_preview_buf(true)
+    return
+  end
+  floutil.gh_cache(
+    self.api_root .. '/' .. entry_str,
+    vim.schedule_wrap(function(_, json)
+      local content = assert(json[self.json_key])
+      content = vim.split(content, '\n')
+      preview_with(self, content)
+    end)
+  )
+end
+
+return M

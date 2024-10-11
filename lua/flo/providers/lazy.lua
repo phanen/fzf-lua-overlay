@@ -68,7 +68,7 @@ local p_do = function(cb, limit)
 end
 
 M.opts = {
-  previewer = require('flo.previewers.lazy').builtin,
+  previewer = { _ctor = function() return require('flo.previewers').lazy end },
   actions = {
     ['default'] = p_do(function(p)
       local dir = p.dir

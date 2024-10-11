@@ -113,3 +113,4 @@ vim.api.nvim_create_autocmd("BufDelete", {
 ## todo
 * [x] integration with dirstack.nvim (https://github.com/phanen/dirstack.nvim/commit/f5efd5e8c7768c22d2d52f6d1ae827a54ccaf416)
 * [x] inject new pickers into fzflua builtin
+* [ ] generic gh api can also be used in lazy previewer (fair enough... btw we finally need more structured-async)
