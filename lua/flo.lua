@@ -1,70 +1,8 @@
 local M = {}
 
-local ls = 'eza --color=always --tree --level=3 --icons=always {}'
-local notes_dir = '~/notes'
-
--- dont care about side effect, just a global table i can use
 local options = {
   cache_dir = (vim.g.state_path or vim.fn.stdpath 'state') .. '/fzf-lua-overlay',
-  ---@type FzfLuaOverlaySpec[]
-  specs = {
-    git_bcommits = {
-      fn = 'git_bcommits',
-      opts = {
-        actions = {
-          ['ctrl-o'] = function(s)
-            local commit = s[1]:match('[^ ]+')
-            vim.cmd.DiffviewOpen(commit)
-          end,
-        },
-      },
-    },
-    find_notes = {
-      fn = 'files',
-      opts = {
-        cwd = notes_dir,
-        actions = {
-          ['ctrl-g'] = function()
-            local last_query = require('fzf-lua').get_last_query()
-            return require('flo').grep_notes({ query = last_query })
-          end,
-          ['ctrl-n'] = function(...) require('flo.actions').create_notes(...) end,
-          ['ctrl-x'] = function(...) require('flo.actions').file_delete(...) end,
-        },
-      },
-    },
-    grep_notes = {
-      fn = 'live_grep_glob',
-      opts = {
-        cwd = notes_dir,
-        actions = {
-          ['ctrl-g'] = function()
-            local last_query = require('fzf-lua').get_last_query()
-            return require('flo').find_notes { query = last_query }
-          end,
-        },
-      },
-    },
-    find_dots = { fn = 'files', opts = { cwd = '~' } },
-    grep_dots = { fn = 'live_grep_glob', opts = { cwd = '~' } },
-    todo_comment = { fn = 'grep', opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true } },
-    zoxide = {
-      fn = 'fzf_exec',
-      opts = {
-        preview = ls,
-        actions = {
-          ['enter'] = function(s) require('flo.util').zoxide_chdir(s[1]) end,
-          ['ctrl-l'] = function(s) require('fzf-lua').files { cwd = s[1] } end,
-          ['ctrl-n'] = function(s) require('fzf-lua').live_grep_native { cwd = s[1] } end,
-          ['ctrl-x'] = {
-            fn = function(s) vim.system { 'zoxide', 'remove', s[1] } end,
-            reload = true,
-          },
-        },
-      },
-      contents = 'zoxide query -l',
-    },
-  },
+  specs = {}, ---@type FzfLuaOverlaySpec[]
 }
 
 package.loaded['flo.config'] = options

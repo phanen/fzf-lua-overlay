@@ -6,27 +6,16 @@ Wrapper and pickers for [fzf-lua](https://github.com/ibhagwan/fzf-lua).
 
 ## features
 * wrapper for all fzf-lua's builtin pickers (support visual selection support, and accept the same options)
-* new pickers
-  * recent files (`vim.v.oldfiles` + recent closed files)
-  * `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
-  * zoxide integration for `chdir` actions
-  * notes/dotfiles management
-  * runtimepath, scriptnames, gitignore, license
+* new pickers: `lazy.nvim`/runtimepath/scriptnames/gitignore/license/recentfiles/zoxide/notes/dotfiles/...
 
 ## usage
-> <https://github.com/phanen/.dotfiles/blob/master/.config/nvim/lua/pack/fzf.lua>
 ```lua
 local fl = setmetatable({}, { __index = function(_, k) return ([[<cmd>lua require('flo').%s()<cr>]]):format(k) end })
-
 return {
   {
-
     'phanen/fzf-lua-overlay',
     main = 'flo',
-    cond = not vim.g.vscode,
-    -- stylua: ignore
     keys = {
-      -- try new pickers
       { '+<c-f>',        fl.lazy,                  mode = { 'n', 'x' } },
       { '+e',            fl.grep_notes,            mode = { 'n' } },
       { "+fi",           fl.gitignore,             mode = { 'n', 'x' } },
@@ -45,7 +34,58 @@ return {
       { '<c-l>',         fl.files,                 mode = { 'n', 'x' } },
       { '<c-n>',         fl.live_grep_native,      mode = { 'n', 'x' } },
     },
-    opts = {},
+    opts = {
+      specs = {
+        find_notes = {
+          fn = 'files',
+          opts = {
+            cwd = '~/notes',
+            actions = {
+              ['ctrl-g'] = function()
+                local last_query = require('fzf-lua').get_last_query()
+                return require('flo').grep_notes({ query = last_query })
+              end,
+              ['ctrl-n'] = function(...) require('flo.actions').create_notes(...) end,
+              ['ctrl-x'] = function(...) require('flo.actions').file_delete(...) end,
+            },
+          },
+        },
+        grep_notes = {
+          fn = 'live_grep_glob',
+          opts = {
+            cwd = '~/notes',
+            actions = {
+              ['ctrl-g'] = function()
+                local last_query = require('fzf-lua').get_last_query()
+                return require('flo').find_notes { query = last_query }
+              end,
+            },
+          },
+        },
+        find_dots = { fn = 'files', opts = { cwd = '~' } },
+        grep_dots = { fn = 'live_grep_glob', opts = { cwd = '~' } },
+        todo_comment = {
+          fn = 'grep',
+          opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true },
+        },
+        zoxide = {
+          fn = 'fzf_exec',
+          opts = {
+            preview = '',
+            actions = {
+              ['enter'] = function(s) require('flo.util').zoxide_chdir(s[1]) end,
+              ['ctrl-l'] = function(s) require('fzf-lua').files { cwd = s[1] } end,
+              ['ctrl-n'] = function(s) require('fzf-lua').live_grep_native { cwd = s[1] } end,
+              ['ctrl-x'] = {
+                fn = function(s) vim.system { 'zoxide', 'remove', s[1] } end,
+                reload = true,
+              },
+            },
+          },
+          contents = 'zoxide query -l',
+        },
+      },
+    },
   },
   -- config fzf-lua still work well
   { 'ibhagwan/fzf-lua', cmd = { 'FzfLua' }, opts = {} },
