@@ -16,7 +16,7 @@ end
 ---@class FzfLuaOverlaySpec
 ---@field fn string|function api's name or custom function
 ---@field inherit? string inherit which opts
----@field opts table
+---@field opts? table
 ---@field contents? (string|number)[]|fun(fzf_cb: fun(entry?: string|number, cb?: function))|string|nil
 
 ---@generic T, K
@@ -39,13 +39,13 @@ local specs = once(function(k)
     if not ok then
       if not or_err:match('^module .* not found:') then error(or_err) end
       assert(require('fzf-lua')[k], ('No such API: %s'):format(k))
-      spec = { fn = k, opts = {} } ---@type FzfLuaOverlaySpec
+      spec = { fn = k } ---@type FzfLuaOverlaySpec
     else
       spec = or_err
     end
   end
   if k ~= 'resume' then
-    spec.opts = vim.tbl_deep_extend('force', spec.opts, {
+    spec.opts = vim.tbl_deep_extend('force', spec.opts or {}, {
       prompt = false,
       winopts = { -- override default-title profile (#1)
         title = '[' .. k .. ']',

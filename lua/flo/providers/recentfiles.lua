@@ -57,6 +57,4 @@ M.fn = function(opts)
   end, opts)
 end
 
-M.opts = {}
-
 return M

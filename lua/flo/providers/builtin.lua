@@ -2,8 +2,6 @@ local M = {} ---@type FzfLuaOverlaySpec
 
 local dir = debug.getinfo(1, 'S').source:sub(2):match('(.*/)')
 
-M.opts = {}
-
 M.fn = function(opts)
   opts = require('fzf-lua.config').normalize_opts(opts, 'builtin')
   local providers = {}
