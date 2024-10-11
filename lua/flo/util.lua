@@ -175,4 +175,11 @@ M.preview_with = function(_self, content)
   _self.win:update_scrollbar()
 end
 
+M.ls = function(path, _fn)
+  for name, type in fs.dir(path) do
+    local fname = fs.joinpath(path, name)
+    if _fn(fname, name, type or uv.fs_stat(fname).type) == false then break end
+  end
+end
+
 return M
