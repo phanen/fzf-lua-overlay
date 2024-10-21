@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.4.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.2...v2.4.0) (2024-10-21)
+
+
+### Features
+
+* **action:** ex_run no confirm ([929a98a](https://github.com/phanen/fzf-lua-overlay/commit/929a98a4a32a240af75f62075d3bfcf5c9c6a4e4))
+* **builtin:** inject by `extends_builtin` ([6423ad7](https://github.com/phanen/fzf-lua-overlay/commit/6423ad7dadc47ef46cc29abd596be72e61bd0fef))
+* make opts optional ([5e57a41](https://github.com/phanen/fzf-lua-overlay/commit/5e57a4138889b96603c0e22e66d25c4e88f71d51))
+
 ## [2.3.2](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.1...v2.3.2) (2024-09-26)
 
 
