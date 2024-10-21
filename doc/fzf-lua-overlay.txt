@@ -1,4 +1,4 @@
-*fzf-lua-overlay.txt*    For Neovim >= 0.8.0    Last change: 2024 September 26
+*fzf-lua-overlay.txt*     For Neovim >= 0.8.0     Last change: 2024 October 21
 
 ==============================================================================
 Table of Contents                          *fzf-lua-overlay-table-of-contents*
@@ -24,30 +24,18 @@ mp4: showcase
 FEATURES                            *fzf-lua-overlay-fzf-lua-overlay-features*
 
 - wrapper for all fzf-lua’s builtin pickers (support visual selection support, and accept the same options)
-- new pickers
-    - recent files (`vim.v.oldfiles` + recent closed files)
-    - `lazy.nvim` (preview in fzf-lua, chdir, open in browser)
-    - zoxide integration for `chdir` actions
-    - notes/dotfiles management
-    - runtimepath, scriptnames, gitignore, license
+- new pickers: `lazy.nvim`/runtimepath/scriptnames/gitignore/license/recentfiles/zoxide/notes/dotfiles/…
 
 
 USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
 
-
-  <https://github.com/phanen/.dotfiles/blob/master/.config/nvim/lua/pack/fzf.lua>
 >lua
     local fl = setmetatable({}, { __index = function(_, k) return ([[<cmd>lua require('flo').%s()<cr>]]):format(k) end })
-    
     return {
       {
-    
         'phanen/fzf-lua-overlay',
         main = 'flo',
-        cond = not vim.g.vscode,
-        -- stylua: ignore
         keys = {
-          -- try new pickers
           { '+<c-f>',        fl.lazy,                  mode = { 'n', 'x' } },
           { '+e',            fl.grep_notes,            mode = { 'n' } },
           { "+fi",           fl.gitignore,             mode = { 'n', 'x' } },
@@ -66,7 +54,57 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
           { '<c-l>',         fl.files,                 mode = { 'n', 'x' } },
           { '<c-n>',         fl.live_grep_native,      mode = { 'n', 'x' } },
         },
-        opts = {},
+        opts = {
+          specs = {
+            find_notes = {
+              fn = 'files',
+              opts = {
+                cwd = '~/notes',
+                actions = {
+                  ['ctrl-g'] = function()
+                    local last_query = require('fzf-lua').get_last_query()
+                    return require('flo').grep_notes({ query = last_query })
+                  end,
+                  ['ctrl-n'] = function(...) require('flo.actions').create_notes(...) end,
+                  ['ctrl-x'] = function(...) require('flo.actions').file_delete(...) end,
+                },
+              },
+            },
+            grep_notes = {
+              fn = 'live_grep_glob',
+              opts = {
+                cwd = '~/notes',
+                actions = {
+                  ['ctrl-g'] = function()
+                    local last_query = require('fzf-lua').get_last_query()
+                    return require('flo').find_notes { query = last_query }
+                  end,
+                },
+              },
+            },
+            find_dots = { fn = 'files', opts = { cwd = '~' } },
+            grep_dots = { fn = 'live_grep_glob', opts = { cwd = '~' } },
+            todo_comment = {
+              fn = 'grep',
+              opts = { search = 'TODO|HACK|PERF|NOTE|FIX', no_esc = true },
+            },
+            zoxide = {
+              fn = function(opts) return require('fzf-lua').fzf_exec('zoxide query -l', opts) end,
+              opts = {
+                preview = '',
+                actions = {
+                  ['enter'] = function(s) require('flo.util').zoxide_chdir(s[1]) end,
+                  ['ctrl-l'] = function(s) require('fzf-lua').files { cwd = s[1] } end,
+                  ['ctrl-n'] = function(s) require('fzf-lua').live_grep_native { cwd = s[1] } end,
+                  ['ctrl-x'] = {
+                    fn = function(s) vim.system { 'zoxide', 'remove', s[1] } end,
+                    reload = true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       -- config fzf-lua still work well
       { 'ibhagwan/fzf-lua', cmd = { 'FzfLua' }, opts = {} },
@@ -103,6 +141,7 @@ TODO                                    *fzf-lua-overlay-fzf-lua-overlay-todo*
 
 - integration with dirstack.nvim  <https://github.com/phanen/dirstack.nvim/commit/f5efd5e8c7768c22d2d52f6d1ae827a54ccaf41>
 - inject new pickers into fzflua builtin
+- generic gh api can also be used in lazy previewer (fair enough… btw we finally need more structured-async)
 
 ==============================================================================
 2. Links                                               *fzf-lua-overlay-links*
