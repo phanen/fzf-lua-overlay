@@ -5,17 +5,6 @@ local fzf = setmetatable({}, { __index = function(_, k) return require('fzf-lua'
 
 local fn, api, fs, uv = vim.fn, vim.api, vim.fs, vim.uv
 
-M.toggle_daily = function(_, opts)
-  local o = opts.__call_opts
-  if opts.show_daily_only then
-    o.cmd = 'fd --color=never --type f --hidden --follow --no-messages --exclude .git'
-  else
-    o.cmd = 'fd "[0-9][0-9]-[0-9][0-9]*"  --type f'
-  end
-  o.show_daily_only = not opts.show_daily_only
-  opts.__call_fn(o)
-end
-
 -- create notes, snips or todos
 M.create_notes = function(_, opts)
   local todo_dir = '~/notes/todo'
