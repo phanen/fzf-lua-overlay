@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/phanen/fzf-lua-overlay/compare/v2.4.0...v2.4.1) (2024-12-16)
+
+
+### Bug Fixes
+
+* with `ex_run_cr` already ([47a9f23](https://github.com/phanen/fzf-lua-overlay/commit/47a9f23c187c0e58e009168193dce49011dae2f2))
+
 ## [2.4.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.2...v2.4.0) (2024-10-21)
 
 
