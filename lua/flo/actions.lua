@@ -139,6 +139,4 @@ M.run_builtin = function(selected)
   pcall(assert(loadstring(string.format("require'flo'.%s()", method))))
 end
 
-M.ex_run = function(selected) return vim.cmd[selected[1]]() end
-
 return M
