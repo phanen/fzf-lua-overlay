@@ -17,9 +17,7 @@ M.fn = function(opts)
       local utils = require 'fzf-lua.utils'
       local co = coroutine.running()
 
-      local bufnr = vim.api.nvim_get_current_buf()
-      local curr_file = vim.api.nvim_buf_get_name(bufnr)
-
+      local curr_file = require('fzf-lua').core.CTX().bname
       local stat_fn = not opts.stat_file and function(_) return true end
         or type(opts.stat_file) == 'function' and opts.stat_file
         or function(file)
