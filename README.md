@@ -2,8 +2,6 @@
 [![CI](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/phanen/fzf-lua-overlay/actions/workflows/ci.yml)
 Wrapper and pickers for [fzf-lua](https://github.com/ibhagwan/fzf-lua).
 
-[mp4: showcase](https://github.com/phanen/fzf-lua-overlay/assets/91544758/134e1dc3-eb1d-4b52-a462-dbe6c23ef53d)
-
 ## features
 * wrapper for all fzf-lua's builtin pickers (support visual selection support, and accept the same options)
 * new pickers: `lazy.nvim`/runtimepath/scriptnames/gitignore/license/recentfiles/zoxide/notes/dotfiles/...
