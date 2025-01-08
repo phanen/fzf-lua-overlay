@@ -7,7 +7,7 @@ local preview_with = function(_self, content)
   vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, content)
   if _self.filetype then vim.bo[tmpbuf].filetype = _self.filetype end
   _self:set_preview_buf(tmpbuf)
-  _self.win:update_scrollbar()
+  _self.win:update_preview_scrollbar()
 end
 
 local github_raw_url = function(url, filepath)
