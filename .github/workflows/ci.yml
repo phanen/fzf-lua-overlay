@@ -35,7 +35,7 @@ jobs:
       - name: panvimdoc
         uses: kdheepak/panvimdoc@main
         with:
-          vimdoc: fzf-lua-overlay
+          vimdoc: fzf-lua-extra
           version: "Neovim >= 0.10.0"
           demojify: true
           treesitter: true
@@ -58,7 +58,7 @@ jobs:
         id: release
         with:
           release-type: simple
-          package-name: fzf-lua-overlay
+          package-name: fzf-lua-extra
           extra-files: |
             lua/lazy/core/config.lua
       - uses: actions/checkout@v3

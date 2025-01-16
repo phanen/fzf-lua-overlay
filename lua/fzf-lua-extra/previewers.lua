@@ -1,6 +1,6 @@
 local M = {}
 local previewer = require('fzf-lua.previewer.builtin')
-local floutil = require('flo.util')
+local utils = require('fzf-lua-extra.utils')
 
 local preview_with = function(_self, content)
   local tmpbuf = _self:get_tmp_buffer()
@@ -29,7 +29,7 @@ local p_type = {
 local parse_entry = function(_, entry_str)
   local slices = vim.split(entry_str, '/')
   local repo = slices[#slices]
-  local plugins = floutil.get_lazy_plugins()
+  local plugins = utils.get_lazy_plugins()
   return plugins[repo]
 end
 
@@ -139,7 +139,7 @@ function M.gitignore:populate_preview_buf(entry_str)
     self:clear_preview_buf(true)
     return
   end
-  floutil.gh_cache(
+  utils.gh_cache(
     self.api_root .. '/' .. entry_str,
     vim.schedule_wrap(function(_, json)
       local content = assert(json[self.json_key])
