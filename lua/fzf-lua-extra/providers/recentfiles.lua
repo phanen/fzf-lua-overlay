@@ -1,7 +1,4 @@
----@type FzfLuaOverlaySpec
-local M = {}
-
-M.fn = function(opts)
+return function(opts)
   opts = require('fzf-lua.config').normalize_opts(opts, 'oldfiles')
   local contents = function(fzf_cb)
     local function add_entry(x, co)
@@ -49,5 +46,3 @@ M.fn = function(opts)
   end
   require('fzf-lua').fzf_exec(contents, opts)
 end
-
-return M

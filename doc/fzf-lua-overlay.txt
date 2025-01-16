@@ -90,7 +90,7 @@ USAGE                                  *fzf-lua-overlay-fzf-lua-overlay-usage*
               opts = {
                 preview = '',
                 actions = {
-                  ['enter'] = function(s) require('flo.util').zoxide_chdir(s[1]) end,
+                  ['enter'] = function(s) require('fzf-lua-extra.util').zoxide_chdir(s[1]) end,
                   ['ctrl-l'] = function(s) require('fzf-lua').files { cwd = s[1] } end,
                   ['ctrl-n'] = function(s) require('fzf-lua').live_grep_native { cwd = s[1] } end,
                   ['ctrl-x'] = {

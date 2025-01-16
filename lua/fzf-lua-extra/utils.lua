@@ -1,25 +1,11 @@
 local M = {}
 
 local api, fn, uv, fs = vim.api, vim.fn, vim.uv, vim.fs
-local iter = vim.iter
 
--- get visual selected with no side effect
-M.getregion = function(mode)
-  mode = mode or api.nvim_get_mode().mode
-  if not vim.tbl_contains({ 'v', 'V', '\022' }, mode) then return {} end
-  return fn.getregion(fn.getpos '.', fn.getpos 'v', { type = mode })
+M.zoxide_chdir = function(path)
+  if fn.executable('zoxide') == 1 then vim.system { 'zoxide', 'add', path } end
+  return api.nvim_set_current_dir(path)
 end
-
-M.zoxide_chdir = (function()
-  if fn.executable('zoxide') == 1 then
-    return function(path)
-      vim.system { 'zoxide', 'add', path }
-      api.nvim_set_current_dir(path)
-    end
-  else
-    return api.nvim_set_current_dir
-  end
-end)()
 
 M.read_file = function(path, flag)
   local fd = io.open(path, flag or 'r')
@@ -32,7 +18,7 @@ end
 -- mkdir for file
 local fs_file_mkdir = function(path)
   local parents = {}
-  iter(fs.parents(path)):all(function(dir)
+  vim.iter(fs.parents(path)):all(function(dir)
     local fs_stat = uv.fs_stat(dir)
     if not fs_stat then
       parents[#parents + 1] = dir
@@ -40,45 +26,17 @@ local fs_file_mkdir = function(path)
     end
     return false
   end)
-
-  iter(parents):rev():each(function(p) return uv.fs_mkdir(p, 493) end)
+  vim.iter(parents):rev():each(function(p) return uv.fs_mkdir(p, 493) end)
 end
 
 -- path should be normalized
--- optionally create parent directory
-M.write_file = function(path, content, flag, opts)
-  opts = opts or { auto_create_dir = true }
-
-  if not uv.fs_stat(path) and opts.auto_create_dir then --
-    fs_file_mkdir(path)
-  end
-
+M.write_file = function(path, content, flag)
+  if not uv.fs_stat(path) then fs_file_mkdir(path) end
   local fd = io.open(path, flag or 'w')
   if not fd then return false end
   if content then fd:write(content) end
   fd:close()
   return true
-end
-
-M.read_json = function(path, opts)
-  opts = opts or {}
-  local str = M.read_file(path)
-  local ok, tbl = pcall(vim.json.decode, str, opts)
-  return ok and tbl or {}
-end
-
-M.write_json = function(path, tbl)
-  local ok, str = pcall(vim.json.encode, tbl)
-  if not ok then return false end
-  return M.write_file(path, str)
-end
-
----@return string?
-M.gitroot = function(bufname)
-  if not bufname then bufname = api.nvim_buf_get_name(0) end
-  local path = fs.dirname(bufname)
-  local obj = vim.system { 'git', '-C', path, 'rev-parse', '--show-toplevel' }:wait()
-  if obj.code == 0 then return vim.trim(obj.stdout) end
 end
 
 ---@type fun(name: string?): table<string, any>
@@ -100,11 +58,6 @@ M.get_lazy_plugins = (function()
   end
 end)()
 
-local log_level = vim.log.levels.WARN
-
----@return nil
-M.log = function(msg, ...) return vim.notify('[fzf] ' .. msg:format(...), log_level) end
-
 ---github restful api
 ---@param route string
 ---@param cb fun(string, table)
@@ -125,6 +78,7 @@ local gh = function(route, cb)
     return str, tbl
   end
 
+  ---@diagnostic disable-next-line: param-type-mismatch
   return vim.system(cmd, function(obj)
     local stdout = obj.stdout
     return cb(parse_gh_result(stdout))
@@ -153,25 +107,43 @@ end
 ---@param cb fun(string, table)
 ---@return vim.SystemObj?
 M.gh_cache = function(route, cb)
-  local root = require('flo.config').cache_dir
-  local path = root .. '/' .. route .. '.json'
+  local cache_root = fn.stdpath 'state' .. '/fzf-lua-extra'
+  local path = cache_root .. '/' .. route .. '.json'
   return gh_cache(route, path, cb)
 end
 
--- snake to camel
----@param name string
----@return string
-M.snake_to_camel = function(name)
-  local names = vim.split(name, '_')
-  local parts = vim.tbl_map(function(part) return part:sub(1, 1):upper() .. part:sub(2) end, names)
-  return table.concat(parts, '')
-end
+M.replace_with_envname = function(name)
+  local xdg_config = vim.env.XDG_CONFIG_HOME
+  local xdg_state = vim.env.XDG_STATE_HOME
+  local xdg_cache = vim.env.XDG_CACHE_HOME
+  local xdg_data = vim.env.XDG_DATA_HOME
+  local vimruntime = vim.env.VIMRUNTIME
 
-M.ls = function(path, _fn)
-  for name, type in fs.dir(path) do
-    local fname = fs.joinpath(path, name)
-    if _fn(fname, name, type or uv.fs_stat(fname).type) == false then break end
+  -- archlinux specific system-wide configs...
+  local vimfile = '/usr/share/vim/vimfiles'
+  vim.env.VIMFILE = vimfile
+  -- note: lazy root may locate in xdg_data
+  -- so it should be mached before data_home
+  local lazy = package.loaded['lazy.core.config'].options.root
+  vim.env.LAZY = lazy
+
+  local ac = require('fzf-lua.utils').ansi_codes
+  if name:match('^' .. lazy) then
+    name = name:gsub('^' .. lazy, ac.cyan('$LAZY'))
+  elseif name:match('^' .. xdg_config) then
+    name = name:gsub('^' .. xdg_config, ac.yellow('$XDG_CONFIG_HOME'))
+  elseif name:match('^' .. xdg_state) then
+    name = name:gsub('^' .. xdg_state, ac.red('$XDG_STATE_HOME'))
+  elseif name:match('^' .. xdg_cache) then
+    name = name:gsub('^' .. xdg_cache, ac.grey('$XDG_CACHE_HOME'))
+  elseif name:match('^' .. xdg_data) then
+    name = name:gsub('^' .. xdg_data, ac.green('$XDG_DATA_HOME'))
+  elseif name:match(vimfile) then
+    name = name:gsub('^' .. vimfile, ac.red('$VIMFILE'))
+  elseif name:match(vimruntime) then
+    name = name:gsub('^' .. vimruntime, ac.red('$VIMRUNTIME'))
   end
+  return name
 end
 
 return M
