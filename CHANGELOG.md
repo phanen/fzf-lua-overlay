@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.0.0](https://github.com/phanen/fzf-lua-extra/compare/v2.4.0...v3.0.0) (2025-01-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove overlay, plugins renaming
+
+### Bug Fixes
+
+* curbuf is not fzf term ([b7cdd2b](https://github.com/phanen/fzf-lua-extra/commit/b7cdd2b9669daa1e35d06a4dc0bacdb16a675aba))
+* legacy showcase ([a4419d8](https://github.com/phanen/fzf-lua-extra/commit/a4419d81dfe485157a71e9f600ed86e281902469))
+* upstream renamed ([f9d073d](https://github.com/phanen/fzf-lua-extra/commit/f9d073da50fba971c2638122b31990510c1e7368))
+* with `ex_run_cr` already ([47a9f23](https://github.com/phanen/fzf-lua-extra/commit/47a9f23c187c0e58e009168193dce49011dae2f2))
+
+
+### Code Refactoring
+
+* remove overlay, plugins renaming ([8b0cf45](https://github.com/phanen/fzf-lua-extra/commit/8b0cf4547fad8e209d654e0f94b7fc4bdb528441))
+
 ## [2.4.0](https://github.com/phanen/fzf-lua-overlay/compare/v2.3.2...v2.4.0) (2024-10-21)
 
 
