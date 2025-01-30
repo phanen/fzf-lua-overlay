@@ -3,9 +3,7 @@ local fn, uv = vim.fn, vim.uv
 
 return function(opts)
   local default = {
-    previewer = {
-      _ctor = function() return require('fzf-lua-extra.previewers').gitignore:extend() end,
-    },
+    previewer = { _ctor = function() return require('fzf-lua-extra.previewers').gitignore end },
     api_root = 'licenses',
     json_key = 'body',
     filetype = 'text',
@@ -23,7 +21,7 @@ return function(opts)
 
         if path and fn.confirm('Override?', '&Yes\n&No') ~= 1 then return end
         local license = assert(selected[1])
-        utils.gh_cache(opts.api_root .. 'licenses/' .. license, function(_, json)
+        utils.gh_cache(opts.api_root .. '/' .. license, function(_, json)
           local content = assert(json.body)
           utils.write_file(path, content)
           vim.cmd.edit(path)

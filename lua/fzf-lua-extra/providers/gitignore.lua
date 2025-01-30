@@ -1,4 +1,4 @@
-local util = require('fzf-lua-extra.utils')
+local utils = require('fzf-lua-extra.utils')
 
 return function(opts)
   local default = {
@@ -17,9 +17,9 @@ return function(opts)
           if confirm ~= 1 then return end
         end
         local filetype = assert(selected[1])
-        util.gh_cache(opts.api_root .. '/' .. filetype, function(_, json)
+        utils.gh_cache(opts.api_root .. '/' .. filetype, function(_, json)
           local content = assert(json.source)
-          util.write_file(path, content)
+          utils.write_file(path, content)
           vim.cmd.edit(path)
         end)
       end,
@@ -27,7 +27,7 @@ return function(opts)
   }
   opts = vim.tbl_extend('force', default, opts or {})
   local contents = function(fzf_cb)
-    util.gh_cache(opts.api_root, function(_, json)
+    utils.gh_cache(opts.api_root, function(_, json)
       coroutine.wrap(function()
         local co = coroutine.running()
         vim.iter(json):each(function(item)

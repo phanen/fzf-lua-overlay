@@ -1,5 +1,5 @@
 -- tbh lazy load is not necessary now, just use alias here
-local util = require('fzf-lua-extra.utils')
+local utils = require('fzf-lua-extra.utils')
 
 ---define how to show the plugins
 ---@param filter fun(p):boolean
@@ -12,7 +12,7 @@ local actions_builder = function(filter, encode)
     coroutine.wrap(function()
       local co = coroutine.running()
       -- stylua: ignore
-      vim.iter(util.get_lazy_plugins())
+      vim.iter(utils.get_lazy_plugins())
         :filter(filter)
         :each(function(_, p)
           fzf_cb(encode(p), function() coroutine.resume(co) end)
@@ -62,7 +62,7 @@ return function(opts)
       vim.iter(selected):take(limit):each(function(sel)
         local bs_parts = vim.split(sel, '/')
         local name = bs_parts[#bs_parts]
-        local plugin = util.get_lazy_plugins(name)
+        local plugin = utils.get_lazy_plugins(name)
         cb(plugin)
       end)
     end
@@ -71,7 +71,7 @@ return function(opts)
     previewer = { _ctor = function() return require('fzf-lua-extra.previewers').lazy end },
     actions = {
       ['enter'] = p_do(function(p)
-        if p.dir and vim.uv.fs_stat(p.dir) then util.zoxide_chdir(p.dir) end
+        if p.dir and vim.uv.fs_stat(p.dir) then utils.zoxide_chdir(p.dir) end
       end),
       ['ctrl-o'] = p_do(function(p) -- search cleaned plugins
         vim.ui.open(p.url or ('https://github.com/search?q=%s'):format(p.name))
