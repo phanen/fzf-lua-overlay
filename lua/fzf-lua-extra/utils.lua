@@ -15,6 +15,17 @@ M.read_file = function(path, flag)
   return content or ''
 end
 
+M.wrap_reload = function(opts, contents)
+  opts.__fn_reload = opts.__fn_reload or function() return contents end
+  local shell = require('fzf-lua.shell')
+  -- build the "reload" cmd and remove '-- {+}' from the initial cmd
+  local reload, id = shell.reload_action_cmd(opts, '{+}')
+  local new_contents = reload:gsub('%-%-%s+{%+}$', '')
+  opts.__reload_cmd = reload
+  opts._fn_pre_fzf = function() shell.set_protected(id) end
+  return new_contents
+end
+
 -- mkdir for file
 local fs_file_mkdir = function(path)
   local parents = {}

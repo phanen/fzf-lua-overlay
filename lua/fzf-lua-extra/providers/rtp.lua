@@ -23,5 +23,6 @@ return function(opts)
     end)
     :totable()
 
+  contents = require('fzf-lua-extra.utils').wrap_reload(opts, contents)
   return require('fzf-lua').fzf_exec(contents, opts)
 end

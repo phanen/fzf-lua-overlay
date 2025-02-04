@@ -1,65 +1,42 @@
 -- tbh lazy load is not necessary now, just use alias here
 local utils = require('fzf-lua-extra.utils')
 
----define how to show the plugins
----@param filter fun(p):boolean
----@param encode fun(p):string to be displayed on fuzzy results
-local actions_builder = function(filter, encode)
-  return function(fzf_cb)
-    -- nil/false -> use default, true -> resume
-    -- for fzf-lua, it's done in previewer side
-    -- or just use fzf's `-d` + `--with-nth`, though more limited
-    coroutine.wrap(function()
-      local co = coroutine.running()
-      -- stylua: ignore
-      vim.iter(utils.get_lazy_plugins())
-        :filter(filter)
-        :each(function(_, p)
-          fzf_cb(encode(p), function() coroutine.resume(co) end)
-          coroutine.yield()
-        end)
-      fzf_cb()
-    end)()
-  end
-end
-
-local disp_repo = function(p)
-  local fullname = p[1]
-  if not fullname then
-    local url = p.url
-    if not url then
-      fullname = 'unknown/' .. p.name -- dummy name
-    else
-      local url_slice = vim.split(url, '/')
-      local username = url_slice[#url_slice - 1]
-      local repo = url_slice[#url_slice]
-      fullname = username .. '/' .. repo
+local State = {}
+State.state = {
+  all_name = function()
+    State.encode = function(p) return p.name end
+  end,
+  all_repo = function()
+    State.encode = function(p)
+      local fullname = p[1]
+      if not fullname then
+        local url = p.url
+        if not url then
+          fullname = 'unknown/' .. p.name -- dummy name
+        else
+          local url_slice = vim.split(url, '/')
+          local username = url_slice[#url_slice - 1]
+          local repo = url_slice[#url_slice]
+          fullname = username .. '/' .. repo
+        end
+      end
+      return fullname
     end
-  end
-  return fullname
+  end,
+}
+State.cycle = function()
+  State.key = next(State.state, State.key)
+  if not State.key then State.key = next(State.state, State.key) end
+  State.state[State.key]()
 end
-
-local all_name = actions_builder(function() return true end, function(p) return p.name end)
-local all_repo = actions_builder(function() return true end, disp_repo)
-
-local toggle_mode = function(from_cb, to_cb, to_opts, toggle_key)
-  -- note: avoid pass incorrect args to from_cb
-  local go_back = { actions = { [toggle_key or 'ctrl-g'] = function() return from_cb() end } }
-  to_opts = vim.tbl_deep_extend('force', to_opts, go_back)
-  require('fzf-lua').fzf_exec(to_cb, to_opts)
-end
+State.get = function() return State.filter, State.encode end
+State.cycle()
 
 return function(opts)
-  -- sequentially run cb on selected (plugins)
-  ---@param cb fun(plugins)
-  local p_do = function(cb, limit)
-    if not limit then
-      limit = 1
-    elseif limit < 0 then
-      limit = math.huge
-    end
+  ---@param cb fun(plugins: table)
+  local p_do = function(cb)
     return function(selected)
-      vim.iter(selected):take(limit):each(function(sel)
+      vim.iter(selected):each(function(sel)
         local bs_parts = vim.split(sel, '/')
         local name = bs_parts[#bs_parts]
         local plugin = utils.get_lazy_plugins(name)
@@ -75,7 +52,7 @@ return function(opts)
       end),
       ['ctrl-o'] = p_do(function(p) -- search cleaned plugins
         vim.ui.open(p.url or ('https://github.com/search?q=%s'):format(p.name))
-      end, -1),
+      end),
       ['ctrl-l'] = p_do(function(p)
         if p.dir and vim.uv.fs_stat(p.dir) then require('fzf-lua').files { cwd = p.dir } end
       end),
@@ -85,9 +62,18 @@ return function(opts)
       ['ctrl-r'] = p_do(
         function(p) require('lazy.core.loader')[p._ and p._.loaded and 'reload' or 'load'](p) end
       ),
-      ['ctrl-g'] = function() return toggle_mode(require('fzf-lua-extra').lazy, all_repo, opts) end,
+      ['ctrl-g'] = { fn = State.cycle, reload = true },
     },
   }
   opts = vim.tbl_extend('force', default, opts or {})
-  return require('fzf-lua').fzf_exec(all_name, opts)
+  local _contents = function(fzf_cb)
+    local filter, encode = State.get()
+    vim
+      .iter(utils.get_lazy_plugins())
+      :filter(filter or function() return true end)
+      :each(function(_, p) fzf_cb(encode(p)) end)
+    fzf_cb()
+  end
+  local contents = require('fzf-lua-extra.utils').wrap_reload(opts, _contents)
+  return require('fzf-lua').fzf_exec(contents, opts)
 end
