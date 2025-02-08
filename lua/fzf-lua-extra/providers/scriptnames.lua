@@ -1,18 +1,10 @@
 return function(opts)
   local default = {
     previewer = 'builtin',
+    _fmt = { from = function(e, _) return vim.fn.expand(e) end },
     winopts = { preview = { hidden = 'nohidden' } },
     file_icons = true,
-    actions = {
-      ['enter'] = function(sel, _)
-        local entry_to_file = function(entry)
-          local path = require('fzf-lua.path').entry_to_file(entry).path
-          path = vim.fn.glob(path)
-          return path
-        end
-        vim.iter(sel):each(function(s) vim.cmd.e(entry_to_file(s)) end)
-      end,
-    },
+    actions = { ['enter'] = require('fzf-lua.actions').file_sel_to_qf },
   }
   opts = vim.tbl_extend('force', default, opts or {})
 
