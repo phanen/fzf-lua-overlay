@@ -1,7 +1,7 @@
 return function(opts)
   local default = {
     previewer = {
-      cmd = 'eza --color=always --tree --level=3 --icons=always -- {}',
+      cmd = 'eza --color=always --tree --level=3 --icons=always',
       _ctor = require('fzf-lua.previewer').fzf.cmd,
     },
     path_shorten = 'set-to-trigger-glob-expansion',
