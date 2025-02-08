@@ -25,7 +25,7 @@ return function(opts)
     ---@diagnostic disable-next-line: undefined-field
     local recents = _G.__recent_hlist or {}
     if recents then
-      recents:foreach(function(node)
+      recents:iter():each(function(node)
         local file = node.key
         if stat_fn(file) and file ~= curr_file then add_entry(file) end
       end)
